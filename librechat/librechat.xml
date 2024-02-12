@@ -62,8 +62,6 @@ https://docs.librechat.ai/</Overview>
   <Config Name="Email Encryption Type" Target="EMAIL_ENCRYPTION" Default="" Mode="" Description="Type of encryption for email delivery (e.g., starttls, tls)." Type="Variable" Display="advanced" Required="false" Mask="false"/>
   <Config Name="Email Server Port" Target="EMAIL_PORT" Default="" Mode="" Description=" Port number for the email server." Type="Variable" Display="advanced" Required="false" Mask="false"/>
   <Config Name="Email Server Host" Target="EMAIL_HOST" Default="" Mode="" Description="Hostname of the email server (e.g., smtp.example.com)." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Enable Redis" Target="USE_REDIS" Default="False" Mode="" Description="Enables or Disables use of Redis" Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Redis URI" Target="REDIS_URI" Default="" Mode="" Description="URI for Redis database. Currently only support on dev version of LibreChat" Type="Variable" Display="advanced" Required="false" Mask="false"/>
   <Config Name="Available Endpoints" Target="ENDPOINTS" Default="" Mode="" Description="Specifies the AI endpoints that LibreChat can use, such as OpenAI, Azure OpenAI, BingAI, ChatGPT Browser, Google, GPT Plugins, and Anthropic." Type="Variable" Display="advanced" Required="false" Mask="false"/>
   <Config Name="Global Proxy" Target="PROXY" Default="" Mode="" Description="A global proxy setting used by all endpoints if specified." Type="Variable" Display="advanced" Required="false" Mask="false"/>
   <Config Name="Azure API Key" Target="AZURE_API_KEY" Default="" Mode="" Description="API key for accessing Azure OpenAI services." Type="Variable" Display="advanced" Required="false" Mask="true"/>
