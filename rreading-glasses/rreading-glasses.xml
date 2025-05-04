@@ -3,7 +3,7 @@
   <Name>rreading-glasses</Name>
   <Repository>blampe/rreading-glasses:latest</Repository>
   <Registry>https://hub.docker.com/r/blampe/rreading-glasses</Registry>
-  <Network>pipernet</Network>
+  <Network>bridge</Network>
   <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
