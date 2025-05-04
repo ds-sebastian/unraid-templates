@@ -4,7 +4,6 @@
   <Repository>blampe/rreading-glasses:latest</Repository>
   <Registry>https://hub.docker.com/r/blampe/rreading-glasses</Registry>
   <Network>bridge</Network>
-  <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
   <Support>https://github.com/blampe/rreading-glasses/issues</Support>
@@ -16,16 +15,19 @@
 - Coalesces, percolates and compresses responses to minimize upstream requests&#xD;
 - Provides full Goodreads compatibility or can proxy the open-source Hardcover API&#xD;
 - Ships as a multi-arch Docker image or a single Go binary-no data dumps or special dependencies</Overview>
+  <Beta>True</Beta>
   <Category>Other: MediaServer:Books</Category>
-  <WebUI/>
-  <TemplateURL/>
-  <Icon>https://github.com/ds-sebastian/unraid-templates/blob/main/icons/rReadingGlasses.png?raw=true</Icon>
+  <ExtraSearchTerms>readarr goodreads books glasses blampe metadata arr hardcover</ExtraSearchTerms>
+  <TemplateURL>https://github.com/ds-sebastian/unraid-templates/blob/main/rreading-glasses/rreading-glasses.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/refs/heads/main/icons/rReadingGlasses.png</Icon>
   <ExtraParams>--entrypoint /main</ExtraParams>
   <PostArgs>serve</PostArgs>
-  <CPUset/>
   <DateInstalled>1746320808</DateInstalled>
-  <DonateText/>
-  <DonateLink/>
+  <Changes>
+    ### 2025-05-03
+
+    Initial release
+  </Changes>
   <Requires>Postgres&#xD;
 Either:&#xD;
 &#x2013; A valid Goodreads session cookie (to avoid 1 RPS throttling on Goodreads queries)&#xD;
@@ -42,5 +44,4 @@ Either:&#xD;
   <Config Name="RPM" Target="RPM" Default="60" Mode="" Description="Maximum upstream requests per minute." Type="Variable" Display="advanced" Required="false" Mask="false">60</Config>
   <Config Name="Proxy" Target="PROXY" Default="" Mode="" Description="HTTP proxy URL for upstream requests. (Leave empty if not used)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
   <Config Name="PostgreSQL Port" Target="POSTGRES_PORT" Default="5432" Mode="" Description="Postgres port." Type="Variable" Display="advanced" Required="true" Mask="false">5432</Config>
-  <TailscaleStateDir/>
 </Container>
