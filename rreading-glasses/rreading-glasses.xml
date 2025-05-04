@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>rreading-glasses</Name>
+  <Repository>blampe/rreading-glasses:latest</Repository>
+  <Registry>https://hub.docker.com/r/blampe/rreading-glasses</Registry>
+  <Network>pipernet</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/blampe/rreading-glasses/issues</Support>
+  <Project>https://github.com/blampe/rreading-glasses</Project>
+  <Overview>rreading-glasses is a drop-in replacement for the official metadata provider that delivers lightning-fast, high-coverage book and author data to your Arr-based library clients (e.g. Readarr, Calibre). &#xD;
+&#xD;
+- Speeds up searches and imports by caching metadata in memory and Postgres&#xD;
+- Supports very large authors and upcoming releases not found in the official service&#xD;
+- Coalesces, percolates and compresses responses to minimize upstream requests&#xD;
+- Provides full Goodreads compatibility or can proxy the open-source Hardcover API&#xD;
+- Ships as a multi-arch Docker image or a single Go binary-no data dumps or special dependencies</Overview>
+  <Category>Other: MediaServer:Books</Category>
+  <WebUI/>
+  <TemplateURL/>
+  <Icon>https://github.com/ds-sebastian/unraid-templates/blob/main/icons/rReadingGlasses.png?raw=true</Icon>
+  <ExtraParams>--entrypoint /main</ExtraParams>
+  <PostArgs>serve</PostArgs>
+  <CPUset/>
+  <DateInstalled>1746320808</DateInstalled>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>Postgres&#xD;
+Either:&#xD;
+&#x2013; A valid Goodreads session cookie (to avoid 1 RPS throttling on Goodreads queries)&#xD;
+&#x2013; OR a Hardcover API Bearer token (for Hardcover upstream)</Requires>
+  <Config Name="Port" Target="8788" Default="8788" Mode="tcp" Description="" Type="Port" Display="always" Required="false" Mask="false">8788</Config>
+  <Config Name="PostgreSQL Host" Target="POSTGRES_HOST" Default="" Mode="" Description="The hostname or IP address of your Postgres server." Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="PostgreSQL User" Target="POSTGRES_USER" Default="" Mode="" Description="The username to connect to Postgres." Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="PostgreSQL Password" Target="POSTGRES_PASSWORD" Default="" Mode="" Description="The password for the Postgres user." Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="PostgreSQL Database" Target="POSTGRES_DATABASE" Default="rreading-glasses" Mode="" Description="The database name to use." Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="Cookie" Target="COOKIE" Default="" Mode="" Description="Cookie used for upstream HTTP requests." Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="Upstream" Target="UPSTREAM" Default="www.goodreads.com" Mode="" Description="The upstream host (e.g. www.example.com)." Type="Variable" Display="always" Required="true" Mask="false">www.goodreads.com</Config>
+  <Config Name="HardcoverAuth" Target="HARDCOVER_AUTH" Default="" Mode="" Description="Hardcover Authorization header, e.g. 'Bearer ...'" Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Port" Target="PORT" Default="8788" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">8788</Config>
+  <Config Name="RPM" Target="RPM" Default="60" Mode="" Description="Maximum upstream requests per minute." Type="Variable" Display="advanced" Required="false" Mask="false">60</Config>
+  <Config Name="Proxy" Target="PROXY" Default="" Mode="" Description="HTTP proxy URL for upstream requests. (Leave empty if not used)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="PostgreSQL Port" Target="POSTGRES_PORT" Default="5432" Mode="" Description="Postgres port." Type="Variable" Display="advanced" Required="true" Mask="false">5432</Config>
+  <TailscaleStateDir/>
+</Container>
