@@ -12,9 +12,7 @@
 &#xD;
 - Speeds up searches and imports by caching metadata in memory and Postgres&#xD;
 - Supports very large authors and upcoming releases not found in the official service&#xD;
-- Coalesces, percolates and compresses responses to minimize upstream requests&#xD;
-- Provides full Goodreads compatibility or can proxy the open-source Hardcover API&#xD;
-- Ships as a multi-arch Docker image or a single Go binary-no data dumps or special dependencies</Overview>
+- Provides full Goodreads compatibility or can proxy the open-source Hardcover API</Overview>
   <Beta>True</Beta>
   <Category>Other: MediaServer:Books</Category>
   <ExtraSearchTerms>readarr goodreads books glasses blampe metadata arr hardcover</ExtraSearchTerms>
