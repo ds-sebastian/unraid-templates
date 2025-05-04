@@ -31,11 +31,11 @@ Either:&#xD;
 &#x2013; A valid Goodreads session cookie (to avoid 1 RPS throttling on Goodreads queries)&#xD;
 &#x2013; OR a Hardcover API Bearer token (for Hardcover upstream)</Requires>
   <Config Name="Port" Target="8788" Default="8788" Mode="tcp" Description="" Type="Port" Display="always" Required="false" Mask="false">8788</Config>
-  <Config Name="PostgreSQL Host" Target="POSTGRES_HOST" Default="" Mode="" Description="The hostname or IP address of your Postgres server." Type="Variable" Display="always" Required="true" Mask="false"></Config>
-  <Config Name="PostgreSQL User" Target="POSTGRES_USER" Default="" Mode="" Description="The username to connect to Postgres." Type="Variable" Display="always" Required="true" Mask="false"></Config>
-  <Config Name="PostgreSQL Password" Target="POSTGRES_PASSWORD" Default="" Mode="" Description="The password for the Postgres user." Type="Variable" Display="always" Required="true" Mask="true"></Config>
-  <Config Name="PostgreSQL Database" Target="POSTGRES_DATABASE" Default="rreading-glasses" Mode="" Description="The database name to use." Type="Variable" Display="always" Required="true" Mask="false"></Config>
-  <Config Name="Cookie" Target="COOKIE" Default="" Mode="" Description="Cookie used for upstream HTTP requests." Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="PostgreSQL Host" Target="POSTGRES_HOST" Default="" Mode="" Description="The hostname or IP address of your Postgres server." Type="Variable" Display="always" Required="true" Mask="false">
+  <Config Name="PostgreSQL User" Target="POSTGRES_USER" Default="" Mode="" Description="The username to connect to Postgres." Type="Variable" Display="always" Required="true" Mask="false">
+  <Config Name="PostgreSQL Password" Target="POSTGRES_PASSWORD" Default="" Mode="" Description="The password for the Postgres user." Type="Variable" Display="always" Required="true" Mask="true">
+  <Config Name="PostgreSQL Database" Target="POSTGRES_DATABASE" Default="rreading-glasses" Mode="" Description="The database name to use." Type="Variable" Display="always" Required="true" Mask="false">
+  <Config Name="Cookie" Target="COOKIE" Default="" Mode="" Description="Cookie used for upstream HTTP requests." Type="Variable" Display="always" Required="false" Mask="false">
   <Config Name="Upstream" Target="UPSTREAM" Default="www.goodreads.com" Mode="" Description="The upstream host (e.g. www.example.com)." Type="Variable" Display="always" Required="true" Mask="false">www.goodreads.com</Config>
   <Config Name="HardcoverAuth" Target="HARDCOVER_AUTH" Default="" Mode="" Description="Hardcover Authorization header, e.g. 'Bearer ...'" Type="Variable" Display="always" Required="false" Mask="false"/>
   <Config Name="Port" Target="PORT" Default="8788" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">8788</Config>
