@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>LibreChat</Name>
-  <Repository>ghcr.io/danny-avila/librechat-dev:latest</Repository>
+  <Repository>ghcr.io/danny-avila/librechat:latest</Repository>
   <Registry>https://github.com/danny-avila/LibreChat</Registry>
   <Network>bridge</Network>
   <MyIP/>
