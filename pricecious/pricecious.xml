@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>pricecious</Name>
+  <Repository>ghcr.io/ds-sebastian/pricecious:main</Repository>
+  <Registry>https://github.com/ds-sebastian/pricecious/pkgs/container/pricecious</Registry>
+  <Network>bridge</Network>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/ds-sebastian/pricecious/issues</Support>
+  <Project>https://github.com/ds-sebastian/pricecious</Project>
+  <Overview>Pricecious is a vibce-coded, self-hosted, AI-powered price tracking application. It uses GenAI Vision Models (OpenAI, Anthropic, Ollama, etc.) to visually analyze product pages, detect prices, and monitor stock status.&#xD;
+&#xD;
+Features:&#xD;
+- AI-Powered Analysis: "Sees" price and stock status, bypassing complex HTML.&#xD;
+- Visual History: Keeps a screenshot history of every check.&#xD;
+- Smart Scrolling: Handles lazy-loaded content.&#xD;
+- Notifications: Supports Discord, Telegram, Email, etc. via Apprise.&#xD;
+&#xD;
+**Prerequisites:**&#xD;
+1. A PostgreSQL Database.&#xD;
+2. A Browserless (headless chrome) container (accessible via WebSocket).&#xD;
+3. An API key for an AI Provider (OpenAI/Anthropic) OR a local Ollama instance.</Overview>
+  <Category>Tools:Utilities Productivity: data:analytics</Category>
+  <WebUI>http://[IP]:[PORT:8000]</WebUI>
+  <TemplateURL>https://github.com/ds-sebastian/unraid-templates/blob/main/pricecious/pricecious.xml</TemplateURL>
+  <Icon>https://github.com/ds-sebastian/pricecious/blob/main/frontend/public/apple-touch-icon.png?raw=true</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <Requires>PostgreSQL Database&#xD;
+Browserless (Chrome) instance</Requires>
+  <Config Name="WebUI Port" Target="8000" Default="8000" Mode="tcp" Description="Container Port: 8000" Type="Port" Display="always" Required="true" Mask="false">8000</Config>
+  <Config Name="Database URL" Target="DATABASE_URL" Default="" Mode="" Description="Format: postgresql://user:password@host:5432/pricewatch" Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="Browserless URL" Target="BROWSERLESS_URL" Default="" Mode="" Description="WebSocket URL for the Browserless instance (e.g., ws://192.168.1.10:3000)" Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="Screenshots Path" Target="/app/screenshots" Default="/mnt/user/appdata/pricecious/screenshots" Mode="rw" Description="Persistent storage for captured screenshots." Type="Path" Display="always" Required="false" Mask="false"/>
+  <Config Name="Log Level" Target="LOG_LEVEL" Default="INFO" Mode="" Description="Application logging level (DEBUG, INFO, WARN, ERROR)." Type="Variable" Display="advanced" Required="false" Mask="false">INFO</Config>
+  <Config Name="SQL Echo" Target="SQL_ECHO" Default="false" Mode="" Description="Log all SQL queries to console (true/false)." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+</Container>
