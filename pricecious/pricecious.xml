@@ -7,7 +7,7 @@
   <Privileged>false</Privileged>
   <Support>https://github.com/ds-sebastian/pricecious/issues</Support>
   <Project>https://github.com/ds-sebastian/pricecious</Project>
-  <Overview>Pricecious is a vibce-coded, self-hosted, AI-powered price tracking application. It uses GenAI Vision Models (OpenAI, Anthropic, Ollama, etc.) to visually analyze product pages, detect prices, and monitor stock status.&#xD;
+  <Overview>Pricecious is a vibe-coded, self-hosted, AI-powered price tracking application. It uses GenAI Vision Models (OpenAI, Anthropic, Ollama, etc.) to visually analyze product pages, detect prices, and monitor stock status.&#xD;
 &#xD;
 Features:&#xD;
 - AI-Powered Analysis: "Sees" price and stock status, bypassing complex HTML.&#xD;
