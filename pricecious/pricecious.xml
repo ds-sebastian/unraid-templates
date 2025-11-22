@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>pricecious</Name>
-  <Repository>ghcr.io/ds-sebastian/pricecious:main</Repository>
+  <Repository>ghcr.io/ds-sebastian/pricecious:latest</Repository>
   <Registry>https://github.com/ds-sebastian/pricecious/pkgs/container/pricecious</Registry>
   <Network>bridge</Network>
   <Privileged>false</Privileged>
