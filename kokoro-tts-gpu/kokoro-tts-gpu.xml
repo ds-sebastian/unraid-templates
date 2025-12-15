@@ -10,16 +10,22 @@
   <Support>https://github.com/remsky/Kokoro-FastAPI/issues</Support>
   <Project>https://github.com/remsky/Kokoro-FastAPI</Project>
   <Overview>Kokoro-FastAPI is a Dockerized FastAPI wrapper for the Kokoro-82M text-to-speech model, optimized for speed and quality.[br][br]&#xD;
-&#xD;
-[b]Features:[/b][br]&#xD;
-- High-quality Japanese and English text-to-speech.[br]&#xD;
-- Accelerated inference using NVIDIA GPUs.[br]&#xD;
-- OpenAI-compatible speech endpoint.[br]&#xD;
-[br]&#xD;
-[b]Requirements:[/b][br]&#xD;
-- Requires the [b]Nvidia Driver[/b] plugin.[br]&#xD;
-- This container runs as internal user [b]1001[/b]. Ensure your "Temp Files" output directory is writable by this user.[br]&#xD;
-- The WebUI is located at [b]/web[/b].</Overview>
+  &#xD;
+  [b]Features:[/b][br]&#xD;
+  - High-quality Japanese and English text-to-speech.[br]&#xD;
+  - Accelerated inference using NVIDIA GPUs.[br]&#xD;
+  - OpenAI-compatible speech endpoint.[br]&#xD;
+  [br]&#xD;
+  [b]Home Assistant Integration:[/b][br]&#xD;
+  This container is fully compatible with the [b]OpenAI TTS[/b] integration in Home Assistant. You can generate local, OpenAI-level quality voice audio using your own GPU.[br]&#xD;
+  1. Install the OpenAI TTS integration (via HACS).[br]&#xD;
+  2. Set the "API Key" to any random text (e.g., "123").[br]&#xD;
+  3. Set the "Target URL" to: [b]http://[IP]:8880/v1[/b][br]&#xD;
+  [br]&#xD;
+  [b]Requirements:[/b][br]&#xD;
+  - Requires the [b]Nvidia Driver[/b] plugin.[br]&#xD;
+  - This container runs as internal user [b]1001[/b]. Ensure your "Temp Files" output directory is writable by this user.[br]&#xD;
+  - The WebUI is located at [b]/web[/b].</Overview>
   <Category>AI:Tools:Utilities</Category>
   <WebUI>http://[IP]:[PORT:8880]/web</WebUI>
   <TemplateURL/>
