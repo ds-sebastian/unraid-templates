@@ -7,7 +7,7 @@
   <MyIP/>
   <Shell>bash</Shell>
   <Privileged>true</Privileged>
-  <Support>https://github.com/ownbee/hass-otbr-docker/issues</Support>
+  <Support>https://community.home-assistant.io/t/ha-docker-with-otbr-docker/735288</Support>
   <Project>https://openthread.io/guides/border-router</Project>
   <Overview>
     [b][u]OpenThread Border Router (Home Assistant Optimized)[/u][/b]&#13;
