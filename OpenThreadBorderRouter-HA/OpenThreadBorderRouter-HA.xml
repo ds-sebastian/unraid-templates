@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Container version="2">
+  <Name>OpenThreadBorderRouter-HA</Name>
+  <Repository>ghcr.io/ownbee/hass-otbr-docker:latest</Repository>
+  <Registry>https://github.com/ownbee/hass-otbr-docker</Registry>
+  <Network>host</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>true</Privileged>
+  <Support>https://github.com/ownbee/hass-otbr-docker/issues</Support>
+  <Project>https://openthread.io/guides/border-router</Project>
+  <Overview>
+    [b][u]OpenThread Border Router (Home Assistant Optimized)[/u][/b]&#13;
+    &#13;
+    This container runs an OpenThread Border Router (OTBR) specifically tweaked for integration with Home Assistant via the Silicon Labs EFR32MG21 chipset (SkyConnect, ZBT-1, Sonoff ZBDongle-E).&#13;
+    &#13;
+    [b][span style='color: #E80000;']CRITICAL PREREQUISITES - READ BEFORE INSTALLING:[/span][/b]&#13;
+    &#13;
+    [b]1. Enable IPv6 in Unraid:[/b]&#13;
+    Navigate to [b]Settings &gt; Network Settings[/b]. Ensure "Network Protocol" is set to [b]IPv4 + IPv6[/b]. If this is disabled, Thread networking will not function.&#13;
+    &#13;
+    [b]2. Host Kernel Configuration (Persistence Required):[/b]&#13;
+    Unraid resets network forwarding rules on every reboot. You must apply the following commands on the Unraid Host to prevent the Thread network from breaking.&#13;
+    &#13;
+    [b]Commands to run:[/b]&#13;
+    [code]&#13;
+    sysctl -w net.ipv6.conf.all.forwarding=1&#13;
+    sysctl -w net.ipv6.conf.br0.accept_ra=2&#13;
+    sysctl -w net.ipv6.conf.eth0.accept_ra=2&#13;
+    [/code]&#13;
+    &#13;
+    [b]How to automate this (Choose one):[/b]&#13;
+    [u]Option A: User Scripts Plugin (Recommended)[/u]&#13;
+    Install the "User Scripts" plugin. Create a new script with the commands above and set it to run [b]"At Startup of Array"[/b].&#13;
+    &#13;
+    [u]Option B: The Go File (Native)[/u]&#13;
+    Edit the file [i]/boot/config/go[/i] on your flash drive and add the commands to the bottom of the file. This will execute them during the boot sequence.&#13;
+    &#13;
+    [b]3. USB Firmware:[/b] Your USB stick MUST be flashed with [b]OpenThread RCP Firmware[/b] at 460800 baud. (Multiprotocol firmware is not supported).&#13;
+    &#13;
+    [b]Configuration Notes:[/b]&#13;
+    - [b]Network Type:[/b] Must be [b]Host[/b] for mDNS discovery.&#13;
+    - [b]WebUI Port:[/b] Default is 8099 (to avoid conflict with Unraid Port 80).
+  </Overview>
+  <Category>HomeAutomation: Tools:Utilities</Category>
+  <WebUI>http://[IP]:[PORT:8099]/</WebUI>
+  <Icon>https://github.com/ds-sebastian/unraid-templates/blob/main/icons/otbr-icon.png?raw=true</Icon>
+  <ExtraParams>--cap-add=SYS_ADMIN --cap-add=NET_ADMIN --sysctl "net.ipv6.conf.all.disable_ipv6=0" --sysctl "net.ipv4.conf.all.forwarding=1" --sysctl "net.ipv6.conf.all.forwarding=1"</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+  
+  <Config Name="Radio Device (Passthrough)" Target="/dev/ttyUSB0" Default="/dev/serial/by-id/YOUR_DEVICE_HERE" Mode="rw" Description="Map your physical USB stick here (use /dev/serial/by-id/...). It maps to /dev/ttyUSB0 inside the container." Type="Device" Display="always" Required="true" Mask="false"/>
+  <Config Name="Radio Path (Internal)" Target="DEVICE" Default="/dev/ttyUSB0" Mode="" Description="The internal path to the radio. Leave this as /dev/ttyUSB0 matching the internal side of the device mapping above." Type="Variable" Display="advanced" Required="true" Mask="false">/dev/ttyUSB0</Config>
+  <Config Name="Baudrate" Target="BAUDRATE" Default="460800" Mode="" Description="Baudrate for RCP Firmware. SkyConnect/ZBT-1/Sonoff-E usually use 460800." Type="Variable" Display="always" Required="true" Mask="false">460800</Config>
+  <Config Name="Flow Control" Target="FLOW_CONTROL" Default="1" Mode="" Description="Hardware Flow Control. Set to 1 for SkyConnect/ZBT-1. Set to 0 if using a generic stick without flow control support." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  
+  <Config Name="Backbone Interface" Target="BACKBONE_IF" Default="br0" Mode="" Description="The Unraid Host interface connected to your LAN/Internet. Usually br0 or eth0." Type="Variable" Display="always" Required="true" Mask="false">br0</Config>
+  <Config Name="OTBR WebUI Port" Target="OTBR_WEB_PORT" Default="8099" Mode="" Description="Port for the OTBR Web Interface. Changed from default 80 to prevent conflict with Unraid." Type="Variable" Display="always" Required="true" Mask="false">8099</Config>
+  <Config Name="OTBR REST Port" Target="OTBR_REST_PORT" Default="8081" Mode="" Description="Port for the REST API (Used by Home Assistant)." Type="Variable" Display="advanced" Required="true" Mask="false">8081</Config>
+  <Config Name="Enable NAT64" Target="NAT64" Default="1" Mode="" Description="Enable NAT64 translation." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Enable Firewall" Target="FIREWALL" Default="1" Mode="" Description="Enable internal firewall." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  
+  <Config Name="Data Storage" Target="/var/lib/thread" Default="/mnt/user/appdata/otbr" Mode="rw" Description="Persistent storage for Thread credentials and dataset." Type="Path" Display="always" Required="true" Mask="false"/>
+  
+  <Config Name="TUN Adapter" Target="/dev/net/tun" Default="/dev/net/tun" Mode="rw" Description="Required for creating the wpan0 network interface." Type="Device" Display="advanced" Required="true" Mask="false">/dev/net/tun</Config>
+  <Config Name="Local Time" Target="/etc/localtime" Default="/etc/localtime" Mode="ro" Description="Sync time with host." Type="Path" Display="advanced" Required="false" Mask="false">/etc/localtime</Config>
+  
+  <Config Name="Auto-Flash Firmware" Target="AUTOFLASH_FIRMWARE" Default="0" Mode="" Description="Disable automatic firmware flashing attempts." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Log Level" Target="OTBR_LOG_LEVEL" Default="info" Mode="" Description="Log verbosity (info, debug, warn)." Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
+</Container>
