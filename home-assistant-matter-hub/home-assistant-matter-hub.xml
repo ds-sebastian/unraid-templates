@@ -7,7 +7,7 @@
   <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
-  <Support>https://github.com/t0bst4r/home-assistant-matter-hub/issues</Support>
+  <Support>https://github.com/t0bst4r/home-assistant-matter-hub/discussions/937</Support>
   <Project>https://github.com/t0bst4r/home-assistant-matter-hub</Project>
   <Overview>This project simulates a Matter bridge to publish your Home Assistant entities to any Matter-compatible controller like Alexa, Apple Home, or Google Home.&#xD;
 &#xD;
