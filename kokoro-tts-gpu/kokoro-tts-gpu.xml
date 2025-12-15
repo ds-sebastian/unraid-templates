@@ -29,7 +29,7 @@
   <Category>AI:Tools:Utilities</Category>
   <WebUI>http://[IP]:[PORT:8880]/web</WebUI>
   <TemplateURL/>
-  <Icon>https://avatars.githubusercontent.com/u/166769057?v=4</Icon>
+  <Icon>https://github.com/ds-sebastian/unraid-templates/blob/main/icons/kokoro-icon.png?raw=true</Icon>
   <ExtraParams>--gpus all --restart=unless-stopped</ExtraParams>
   <PostArgs/>
   <CPUset/>
