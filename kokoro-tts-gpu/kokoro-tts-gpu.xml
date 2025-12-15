@@ -26,7 +26,7 @@
   - Requires the [b]Nvidia Driver[/b] plugin.[br]&#xD;
   - This container runs as internal user [b]1001[/b]. Ensure your "Temp Files" output directory is writable by this user.[br]&#xD;
   - The WebUI is located at [b]/web[/b].</Overview>
-  <Category>AI:Tools:Utilities</Category>
+  <Category>AI: Tools:Utilities</Category>
   <WebUI>http://[IP]:[PORT:8880]/web</WebUI>
   <TemplateURL/>
   <Icon>https://github.com/ds-sebastian/unraid-templates/blob/main/icons/kokoro-icon.png?raw=true</Icon>
