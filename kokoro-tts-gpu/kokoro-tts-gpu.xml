@@ -7,7 +7,7 @@
   <MyIP/>
   <Shell>bash</Shell>
   <Privileged>false</Privileged>
-  <Support>https://github.com/remsky/Kokoro-FastAPI/issues</Support>
+  <Support>https://github.com/remsky/Kokoro-FastAPI/discussions/230</Support>
   <Project>https://github.com/remsky/Kokoro-FastAPI</Project>
   <Overview>Kokoro-FastAPI is a Dockerized FastAPI wrapper for the Kokoro-82M text-to-speech model, optimized for speed and quality.[br][br]&#xD;
   &#xD;
