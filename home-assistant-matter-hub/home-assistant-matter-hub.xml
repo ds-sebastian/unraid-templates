@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>home-assistant-matter-hub</Name>
+  <Repository>ghcr.io/t0bst4r/home-assistant-matter-hub:latest</Repository>
+  <Registry>https://github.com/t0bst4r/home-assistant-matter-hub/pkgs/container/home-assistant-matter-hub</Registry>
+  <Network>host</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/t0bst4r/home-assistant-matter-hub/issues</Support>
+  <Project>https://github.com/t0bst4r/home-assistant-matter-hub</Project>
+  <Overview>This project simulates a Matter bridge to publish your Home Assistant entities to any Matter-compatible controller like Alexa, Apple Home, or Google Home.&#xD;
+&#xD;
+[span style='color: #E80000; font-weight: bold;']REQUIRED SETTINGS:[/span]&#xD;
+1. You MUST generate a "Long-Lived Access Token" in Home Assistant (User Profile &gt; Security).&#xD;
+2. Network Type MUST be set to [b]Host[/b].&#xD;
+3. IPv6 MUST be enabled in Unraid's Network Settings.&#xD;
+&#xD;
+[span style='color: #E80000; font-weight: bold;']TROUBLESHOOTING (Offline Devices / Issue #563):[/span]&#xD;
+If devices pair but show as "Offline" or "Not Responding", your Unraid host is likely dropping IPv6 packets on the bridge interface. This is common in Unraid 7+ or Docker 26+.&#xD;
+&#xD;
+[b]Fix:[/b] Run this command in the Unraid Terminal:&#xD;
+[code]ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT[/code]&#xD;
+(If this fixes it, add that command to the "User Scripts" plugin to run at array startup).</Overview>
+  <Category>HomeAutomation: Tools:</Category>
+  <WebUI>http://[IP]:[PORT:8482]</WebUI>
+  <TemplateURL/>
+  <Icon>https://github.com/ds-sebastian/unraid-templates/blob/main/icons/ha-matter-hub-icon.png?raw=true</Icon>
+  <ExtraParams>--restart unless-stopped</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+  <Config Name="Home Assistant URL" Target="HAMH_HOME_ASSISTANT_URL" Default="http://YOUR_HA_IP:8123" Mode="" Description="Full URL including http/https and port." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="Access Token" Target="HAMH_HOME_ASSISTANT_ACCESS_TOKEN" Default="" Mode="" Description="Long-Lived Access Token from Home Assistant." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="Storage Path" Target="/data" Default="/mnt/user/appdata/home-assistant-matter-hub" Mode="rw" Description="Persistent storage location." Type="Path" Display="always" Required="true" Mask="false"/>
+  <Config Name="WebUI Port" Target="HAMH_HTTP_PORT" Default="8482" Mode="" Description="Port for the web interface. Note: Changing this requires manually updating the WebUI link." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Log Level" Target="HAMH_LOG_LEVEL" Default="info" Mode="" Description="Options: silly, debug, info, warn, error." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="mDNS Interface" Target="HAMH_MDNS_NETWORK_INTERFACE" Default="" Mode="" Description="Optional: Force a specific interface for mDNS (e.g., br0 or eth0). Leave empty to auto-detect." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+</Container>
