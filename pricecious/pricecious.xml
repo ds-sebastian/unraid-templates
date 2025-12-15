@@ -19,7 +19,7 @@ Features:&#xD;
 1. A PostgreSQL Database.&#xD;
 2. A Browserless (headless chrome) container (accessible via WebSocket).&#xD;
 3. An API key for an AI Provider (OpenAI/Anthropic) OR a local Ollama instance.</Overview>
-  <Category>Tools:Utilities Productivity: data:analytics</Category>
+  <Category>Tools:Utilities AI:</Category>
   <WebUI>http://[IP]:[PORT:8000]</WebUI>
   <TemplateURL>https://github.com/ds-sebastian/unraid-templates/blob/main/pricecious/pricecious.xml</TemplateURL>
   <Icon>https://github.com/ds-sebastian/pricecious/blob/main/frontend/public/apple-touch-icon.png?raw=true</Icon>
