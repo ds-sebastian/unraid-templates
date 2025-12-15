@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>Kokoro-FastAPI-GPU</Name>
+  <Repository>ghcr.io/remsky/kokoro-fastapi-gpu:latest</Repository>
+  <Registry>https://github.com/remsky/Kokoro-FastAPI/pkgs/container/kokoro-fastapi-gpu</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/remsky/Kokoro-FastAPI/issues</Support>
+  <Project>https://github.com/remsky/Kokoro-FastAPI</Project>
+  <Overview>Kokoro-FastAPI is a Dockerized FastAPI wrapper for the Kokoro-82M text-to-speech model, optimized for speed and quality.[br][br]&#xD;
+&#xD;
+[b]Features:[/b][br]&#xD;
+- High-quality Japanese and English text-to-speech.[br]&#xD;
+- Accelerated inference using NVIDIA GPUs.[br]&#xD;
+- OpenAI-compatible speech endpoint.[br]&#xD;
+[br]&#xD;
+[b]Requirements:[/b][br]&#xD;
+- Requires the [b]Nvidia Driver[/b] plugin.[br]&#xD;
+- This container runs as internal user [b]1001[/b]. Ensure your "Temp Files" output directory is writable by this user.[br]&#xD;
+- The WebUI is located at [b]/web[/b].</Overview>
+  <Category>AI:Tools:Utilities</Category>
+  <WebUI>http://[IP]:[PORT:8880]/web</WebUI>
+  <TemplateURL/>
+  <Icon>https://avatars.githubusercontent.com/u/166769057?v=4</Icon>
+  <ExtraParams>--gpus all --restart=unless-stopped</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>Nvidia Driver</Requires>
+  <Config Name="WebUI Port" Target="8880" Default="8880" Mode="tcp" Description="Port for the FastAPI server." Type="Port" Display="always" Required="true" Mask="false">8880</Config>
+  <Config Name="Temp Files (Audio Output)" Target="/app/api/temp_files" Default="/mnt/user/appdata/kokoro-tts/temp" Mode="rw" Description="Directory where generated audio files are saved. MUST be writable by UID 1001." Type="Path" Display="always" Required="false" Mask="false"/>
+  <Config Name="NVIDIA_VISIBLE_DEVICES" Target="NVIDIA_VISIBLE_DEVICES" Default="all" Mode="" Description="GPU UUID to pass to the container (or 'all')." Type="Variable" Display="always" Required="true" Mask="false">all</Config>
+  <Config Name="NVIDIA_DRIVER_CAPABILITIES" Target="NVIDIA_DRIVER_CAPABILITIES" Default="all" Mode="" Description="Nvidia driver capabilities." Type="Variable" Display="advanced" Required="false" Mask="false">all</Config>
+  <Config Name="Use GPU" Target="USE_GPU" Default="true" Mode="" Description="Explicitly enable GPU usage." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Device Type" Target="DEVICE" Default="gpu" Mode="" Description="Set inference device (gpu or cpu)." Type="Variable" Display="advanced" Required="false" Mask="false">gpu</Config>
+</Container>
