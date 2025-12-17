@@ -9,68 +9,41 @@
   <Privileged>false</Privileged>
   <Support>https://forums.unraid.net/topic/151417-support-pureelectricity-librechat/</Support>
   <Project>https://github.com/danny-avila/LibreChat</Project>
-  <Overview>LibreChat brings together the future of assistant AIs with the revolutionary technology of OpenAI's ChatGPT. Celebrating the original styling, LibreChat gives you the ability to integrate multiple AI models. It also integrates and enhances original client features such as conversation and message search, prompt templates and plugins.&#xD;
+  <Overview>LibreChat: Enhanced ChatGPT Clone. Features: Agents, Anthropic, AWS, OpenAI, Azure, Gemini, AI model switching, message search, langchain, DALL-E-3, Multi-User Auth, and more.&#xD;
 &#xD;
-https://docs.librechat.ai/</Overview>
-  <Category>Tools:</Category>
+[b]PREREQUISITES:[/b]&#xD;
+1. You must have a MongoDB container running (e.g., the official mongo docker).&#xD;
+2. You must generate random hex strings for the CREDS_KEY, CREDS_IV, and JWT_SECRET below, or logins will fail.&#xD;
+&#xD;
+[b]CONFIGURATION:[/b]&#xD;
+- This template uses Environment Variables for config. &#xD;
+- The 'librechat.yaml' file is optional and not mapped by default to prevent boot errors. If you need advanced configuration (custom endpoints), create the file on your server first, then add a Host Path mapping manually: /mnt/user/appdata/librechat/librechat.yaml -> /app/librechat.yaml</Overview>
+  <Category>Tools: Productivity:</Category>
   <WebUI>http://[IP]:[PORT:3080]/</WebUI>
   <TemplateURL/>
-  <Icon>https://github.com/ds-sebastian/unraid-templates/blob/main/icons/LibreChat.png?raw=true</Icon>
+  <Icon>https://raw.githubusercontent.com/danny-avila/LibreChat/main/client/public/assets/logo.png</Icon>
   <ExtraParams/>
   <PostArgs/>
   <CPUset/>
-  <DateInstalled>1705529816</DateInstalled>
+  <DateInstalled/>
   <DonateText/>
   <DonateLink/>
   <Requires/>
-  <Config Name="Port UI" Target="3080" Default="3080" Mode="tcp" Description="Port for LibreChat UI" Type="Port" Display="always" Required="true" Mask="false"/>
-  <Config Name="Crypto Key" Target="CREDS_KEY" Default="" Mode="" Description="A 32-byte hexadecimal key used for cryptographic operations." Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="Crypto Initialization Vector" Target="CREDS_IV" Default="" Mode="" Description="A 16-byte hexadecimal initialization vector for crypto operations." Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="MongoDB URI" Target="MONGO_URI" Default="" Mode="" Description="Connection URI for MongoDB database. &#13;&#10;Format: mongodb://ip:port/database" Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="JWT Secret" Target="JWT_SECRET" Default="" Mode="" Description="Secret key for JSON Web Token (JWT) authentication." Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="JWT Refresh Secret" Target="JWT_REFRESH_SECRET" Default="" Mode="" Description="Secret key for JWT refresh tokens." Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="Email From Address" Target="EMAIL_FROM" Default="" Mode="" Description="The email address used in the 'From' field in outgoing emails." Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="Email Service Provider" Target="EMAIL_SERVICE" Default="" Mode="" Description="Service provider for sending emails (e.g., Gmail, Yahoo)." Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="Email Username" Target="EMAIL_USERNAME" Default="" Mode="" Description="Username for the email service provider account." Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="Email Password" Target="EMAIL_PASSWORD" Default="" Mode="" Description="(App) Password for the email service provider account." Type="Variable" Display="always" Required="false" Mask="true"/>
-  <Config Name="OpenAI API Key" Target="OPENAI_API_KEY" Default="user_provided" Mode="" Description="API key for accessing OpenAI services." Type="Variable" Display="always" Required="false" Mask="true"/>
-  <Config Name="Enable Email Login" Target="ALLOW_EMAIL_LOGIN" Default="" Mode="" Description="Toggle to enable (true) or disable (false) login via email." Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="Enable Email Registration" Target="ALLOW_REGISTRATION" Default="" Mode="" Description="Toggle to enable (true) or disable (false) user registration via email." Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="Enable Social Login" Target="ALLOW_SOCIAL_LOGIN" Default="" Mode="" Description="Toggle to enable (true) or disable (false) login using various social networks." Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="Enable Social Registration" Target="ALLOW_SOCIAL_REGISTRATION" Default="" Mode="" Description="Toggle to enable (true) or disable (false) user registration using social networks." Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="Client Domain" Target="DOMAIN_CLIENT" Default="" Mode="" Description="Specifies the domain name used for the client-side of the application. It's the domain that users interact with in their browser. This should match the public-facing URL of your reverse proxy or load balancer, ensuring that all client-side redirects and requests use this domain. For instance, if your reverse proxy domain for the client interface is https://chat.domain.com, then DOMAIN_CLIENT should be set to this URL." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="Server Domain" Target="DOMAIN_SERVER" Default="" Mode="" Description="Defines the domain name used for server-side operations. It's crucial for internal communications and redirects that happen on the server side of the application. This should be set to the domain or URL where the server is accessible, especially in cases where different domains are used for client and server parts of the application. Similar to DOMAIN_CLIENT, if your server is accessed through https://api.domain.com, then set DOMAIN_SERVER to this URL." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="Debug Logging Enabled" Target="DEBUG_LOGGING" Default="False" Mode="" Description="Enables debug logging" Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="UID" Target="UID" Default="1000" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="false">1000</Config>
-  <Config Name="GID" Target="GID" Default="1000" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="false">1000</Config>
-  <Config Name="DALL-E API Key" Target="DALLE_API_KEY" Default="" Mode="" Description="OpenAI API key for DALL-E / DALL-E-3. If you want to provide your own key for all users you can add your OpenAI API key here." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Enable Titling Conversations" Target="TITLE_CONVO" Default="True" Mode="" Description="Titling is enabled by default when initiating a conversation.&#13;&#10;Set to false to disable this feature" Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="OpenAI Title Model" Target="OPENAI_TITLE_MODEL" Default="gpt-3.5-turbo" Mode="" Description="The default model used for titling by is gpt-3.5-turbo. You can change it by setting the desired model. (Optional)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="OpenAI Summarization" Target="OPENAI_SUMMARIZE" Default="" Mode="" Description="Enable message summarization by uncommenting the following (Optional/Experimental)&#13;&#10;Note: this may affect response time when a summary is being generated." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Google Search API Key" Target="GOOGLE_API_KEY" Default="" Mode="" Description="Google Search API Key. https://developers.google.com/custom-search/v1/introduction" Type="Variable" Display="advanced" Required="false" Mask="true"/>
-  <Config Name="Google Custom Search Engine ID" Target="GOOGLE_CSE_ID" Default="" Mode="" Description="Search Engine ID" Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="OpenID Client ID" Target="OPENID_CLIENT_ID" Default="" Mode="" Description="The client identifier assigned by the OpenID provider upon registration of the application." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="OpenID Client Secret" Target="OPENID_CLIENT_SECRET" Default="" Mode="" Description="The client secret assigned by the OpenID provider, used to authenticate the identity of the application to the provider." Type="Variable" Display="advanced" Required="false" Mask="true"/>
-  <Config Name="OpenID Issuer URL" Target="OPENID_ISSUER" Default="" Mode="" Description="The URL of the OpenID provider's configuration document." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="OpenID Session Secret" Target="OPENID_SESSION_SECRET" Default="" Mode="" Description="A secret string used to sign the session identifier, enhancing security around sessions." Type="Variable" Display="advanced" Required="false" Mask="true"/>
-  <Config Name="OpenID Scope" Target="OPENID_SCOPE" Default="" Mode="" Description="Specifies the scope of access requests, such as openid, profile, and email. This determines the level of access and the type of information the application can retrieve from the OpenID provider." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="OpenID Callback URL" Target="OPENID_CALLBACK_URL" Default="" Mode="" Description="The URL to which the OpenID provider redirects the user after authentication. It must match one of the allowed callback URLs configured in the OpenID application settings." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="OpenID Button Label" Target="OPENID_BUTTON_LABEL" Default="" Mode="" Description="Text label for the OpenID login button, customizable to fit the application's user interface." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="OpenID Button Image URL" Target="OPENID_IMAGE_URL" Default="" Mode="" Description="URL of an image to be used for the OpenID login button, allowing customization of the button's appearance." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Session Expiry Time" Target="SESSION_EXPIRY" Default="" Mode="" Description="Duration (in milliseconds) after which the session expires." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Refresh Token Expiry Time" Target="REFRESH_TOKEN_EXPIRY" Default="" Mode="" Description="Duration (in milliseconds) after which the refresh token expires." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Email Encryption Type" Target="EMAIL_ENCRYPTION" Default="" Mode="" Description="Type of encryption for email delivery (e.g., starttls, tls)." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Email Server Port" Target="EMAIL_PORT" Default="" Mode="" Description=" Port number for the email server." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Email Server Host" Target="EMAIL_HOST" Default="" Mode="" Description="Hostname of the email server (e.g., smtp.example.com)." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Available Endpoints" Target="ENDPOINTS" Default="" Mode="" Description="Specifies the AI endpoints that LibreChat can use, such as OpenAI, Azure OpenAI, BingAI, ChatGPT Browser, Google, GPT Plugins, and Anthropic." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Global Proxy" Target="PROXY" Default="" Mode="" Description="A global proxy setting used by all endpoints if specified." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Azure API Key" Target="AZURE_API_KEY" Default="" Mode="" Description="API key for accessing Azure OpenAI services." Type="Variable" Display="advanced" Required="false" Mask="true"/>
-  <Config Name="BingAI Access Token" Target="BINGAI_TOKEN" Default="" Mode="" Description="Token for accessing Bing AI services, including Sydney, jailbreak, and Bing Image Creator." Type="Variable" Display="advanced" Required="false" Mask="true"/>
-  <Config Name="ChatGPT Reverse Proxy" Target="CHATGPT_REVERSE_PROXY" Default="" Mode="" Description="Reverse proxy URL for ChatGPT endpoint." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Google AI API Key" Target="GOOGLE_KEY" Default="" Mode="" Description="Key for accessing Google AI services." Type="Variable" Display="advanced" Required="false" Mask="true"/>
-  <Config Name="OpenRouter API Key" Target="OPENROUTER_API_KEY" Default="" Mode="" Description="API key for OpenRouter, a service that provides access to various LLMs." Type="Variable" Display="advanced" Required="false" Mask="true"/>
-  <Config Name="Plugin Models" Target="PLUGIN_MODELS" Default="" Mode="" Description="Specifies the AI models available for plugins in LibreChat." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="MeiliSearch Master Key" Target="MEILI_MASTER_KEY" Default="" Mode="" Description="Master key for accessing MeiliSearch, a search database." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="MeiliSearch Host" Target="MEILI_HOST" Default="" Mode="" Description="Host address for MeiliSearch service." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Enable Token Balancing" Target="CHECK_BALANCE" Default="" Mode="" Description="Enables token credit limiting for the OpenAI/Plugins endpoints" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="WebUI Port" Target="3080" Default="3080" Mode="tcp" Description="The port to access the LibreChat interface." Type="Port" Display="always" Required="true" Mask="false"/>
+  <Config Name="Host Binding" Target="HOST" Default="0.0.0.0" Mode="" Description="Required for Docker networking." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="Client Domain" Target="DOMAIN_CLIENT" Default="http://[IP]:[PORT:3080]" Mode="" Description="The URL used to access the app. MUST include http:// or https://. " Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="Server Domain" Target="DOMAIN_SERVER" Default="http://[IP]:[PORT:3080]" Mode="" Description="Usually the same as Client Domain." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="MongoDB URI" Target="MONGO_URI" Default="" Mode="" Description="Required. Format: mongodb://[IP]:27017/LibreChat" Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="Crypto Key" Target="CREDS_KEY" Default="" Mode="" Description="Required. 64-character hex string. Run 'openssl rand -hex 32' to generate." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="Crypto IV" Target="CREDS_IV" Default="" Mode="" Description="Required. 32-character hex string. Run 'openssl rand -hex 16' to generate." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="JWT Secret" Target="JWT_SECRET" Default="" Mode="" Description="Required. Long random string for signing tokens." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="JWT Refresh Secret" Target="JWT_REFRESH_SECRET" Default="" Mode="" Description="Required. Long random string for refresh tokens." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="OpenAI API Key" Target="OPENAI_API_KEY" Default="user_provided" Mode="" Description="Optional. If set to 'user_provided', users can enter their own key in the UI." Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Image Storage" Target="/app/client/public/images" Default="/mnt/user/appdata/librechat/images" Mode="rw" Description="Persist uploaded images and avatars." Type="Path" Display="always" Required="true" Mask="false"/>
+  <Config Name="Logs" Target="/app/logs" Default="/mnt/user/appdata/librechat/logs" Mode="rw" Description="Container logs." Type="Path" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Install MeiliSearch" Target="SEARCH" Default="false" Mode="" Description="Set to 'true' only if you have a separate MeiliSearch container running for chat history search." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="MeiliSearch Host" Target="MEILI_HOST" Default="" Mode="" Description="http://[IP]:7700" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="MeiliSearch Key" Target="MEILI_MASTER_KEY" Default="" Mode="" Description="The master key from your MeiliSearch container." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="UID" Target="UID" Default="99" Mode="" Description="Unraid Default User ID" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="GID" Target="GID" Default="100" Mode="" Description="Unraid Default Group ID" Type="Variable" Display="advanced" Required="false" Mask="false"/>
 </Container>
