@@ -64,7 +64,7 @@
   <Config Name="Enable NAT64" Target="NAT64" Default="1" Mode="" Description="Enable NAT64 translation." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
   <Config Name="Enable Firewall" Target="FIREWALL" Default="1" Mode="" Description="Enable internal firewall." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
   
-  <Config Name="Data Storage" Target="/var/lib/thread" Default="/mnt/user/appdata/otbr" Mode="rw" Description="Persistent storage for Thread credentials and dataset." Type="Path" Display="always" Required="true" Mask="false"/>
+  <Config Name="Data Storage" Target="/data/thread" Default="/mnt/user/appdata/otbr" Mode="rw" Description="Persistent storage for Thread credentials and dataset." Type="Path" Display="always" Required="true" Mask="false"/>
   
   <Config Name="TUN Adapter" Target="/dev/net/tun" Default="/dev/net/tun" Mode="rw" Description="Required for creating the wpan0 network interface." Type="Device" Display="advanced" Required="true" Mask="false">/dev/net/tun</Config>
   <Config Name="Local Time" Target="/etc/localtime" Default="/etc/localtime" Mode="ro" Description="Sync time with host." Type="Path" Display="advanced" Required="false" Mask="false">/etc/localtime</Config>
