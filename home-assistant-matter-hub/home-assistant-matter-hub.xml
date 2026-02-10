@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>home-assistant-matter-hub</Name>
-  <Repository>ghcr.io/t0bst4r/home-assistant-matter-hub:latest</Repository>
-  <Registry>https://github.com/t0bst4r/home-assistant-matter-hub/pkgs/container/home-assistant-matter-hub</Registry>
+  <Repository>ghcr.io/RiDDiX/home-assistant-matter-hub:latest</Repository>
+  <Registry>https://github.com/RiDDiX/home-assistant-matter-hub/pkgs/container/home-assistant-matter-hub</Registry>
   <Network>host</Network>
   <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
-  <Support>https://github.com/t0bst4r/home-assistant-matter-hub/discussions/937</Support>
-  <Project>https://github.com/t0bst4r/home-assistant-matter-hub</Project>
+  <Support>https://github.com/RiDDiX/home-assistant-matter-hub</Support>
+  <Project>https://github.com/RiDDiX/home-assistant-matter-hub</Project>
   <Overview>This project simulates a Matter bridge to publish your Home Assistant entities to any Matter-compatible controller like Alexa, Apple Home, or Google Home.&#xD;
 &#xD;
 [span style='color: #E80000; font-weight: bold;']REQUIRED SETTINGS:[/span]&#xD;
