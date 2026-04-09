@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>openviking</Name>
+  <Repository>ghcr.io/volcengine/openviking:latest</Repository>
+  <Registry>https://github.com/volcengine/OpenViking</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/volcengine/OpenViking/issues</Support>
+  <Project>https://github.com/volcengine/OpenViking</Project>
+  <Overview>[b]OpenViking[/b] is an open-source memory context database for AI agents.[br][br]
+[b]Container behavior:[/b][br]
+- Starts the OpenViking API server on port [b]1933[/b].[br]
+- Starts the Console UI on port [b]8020[/b].[br]
+- Starts the bundled [b]vikingbot[/b] by default.[br][br]
+[b]Important first-run requirement:[/b][br]
+Create the [code]ov.conf[/code] file [b]before starting the container[/b]. Mount it to [code]/app/ov.conf[/code].[br][br]
+If your config binds the server to [code]0.0.0.0[/code], you [b]must[/b] set [code]server.root_api_key[/code] or OpenViking will refuse to start.[br][br]
+[b]Suggested ov.conf example:[/b][br]
+[code]{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 1933,
+    "root_api_key": "INSERT_API_KEY_HERE"
+  },
+  "storage": {
+    "workspace": "/app/data"
+  },
+  "log": {
+    "level": "INFO",
+    "output": "stdout"
+  },
+  "embedding": {
+    "dense": {
+      "backend": "openai",
+      "api_key": "",
+      "model": "",
+      "api_base": "",
+      "dimension": 1536
+    }
+  },
+  "vlm": {
+    "backend": "",
+    "api_key": "",
+    "model": "",
+    "api_base": "",
+    "temperature": 0.1,
+    "max_retries": 3
+  }
+}[/code][br][br]
+After startup, verify the API with [code]http://[IP]:1933/health[/code].</Overview>
+  <Category>AI:Tools</Category>
+  <WebUI>http://[IP]:[PORT:8020]/</WebUI>
+  <TemplateURL/>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/refs/heads/main/icons/ov-logo.png</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+
+  <Config Name="API Port" Target="1933" Default="1933" Mode="tcp" Description="OpenViking API server port." Type="Port" Display="always" Required="true" Mask="false">1933</Config>
+  <Config Name="Console UI Port" Target="8020" Default="8020" Mode="tcp" Description="OpenViking Console UI port." Type="Port" Display="always" Required="true" Mask="false">8020</Config>
+
+  <Config Name="Data Directory" Target="/app/data" Default="/mnt/user/appdata/openviking/data" Mode="rw" Description="Persistent workspace/data directory for OpenViking." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openviking/data</Config>
+  <Config Name="Config File" Target="/app/ov.conf" Default="/mnt/user/appdata/openviking/ov.conf" Mode="rw" Description="Path to ov.conf on the host. Create this file before first start." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openviking/ov.conf</Config>
+
+  <Config Name="Enable VikingBot" Target="OPENVIKING_WITH_BOT" Default="1" Mode="" Description="Set to 0 to disable the bundled vikingbot startup." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+</Container>
