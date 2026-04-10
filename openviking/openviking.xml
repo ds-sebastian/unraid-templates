@@ -49,22 +49,19 @@ If your config binds the server to [code]0.0.0.0[/code], you [b]must[/b] set [co
   }
 }[/code][br][br]
 After startup, verify the API with [code]http://[IP]:1933/health[/code].</Overview>
-  <Category>AI:Tools</Category>
+  <Category>AI: Tools:</Category>
   <WebUI>http://[IP]:[PORT:8020]/</WebUI>
   <TemplateURL/>
   <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/refs/heads/main/icons/ov-logo.png</Icon>
   <ExtraParams>--restart=unless-stopped</ExtraParams>
-  <PostArgs/>
+  <PostArgs>openviking-server</PostArgs>
   <CPUset/>
   <DonateText/>
   <DonateLink/>
   <Requires/>
 
   <Config Name="API Port" Target="1933" Default="1933" Mode="tcp" Description="OpenViking API server port." Type="Port" Display="always" Required="true" Mask="false">1933</Config>
-  <Config Name="Console UI Port" Target="8020" Default="8020" Mode="tcp" Description="OpenViking Console UI port." Type="Port" Display="always" Required="true" Mask="false">8020</Config>
-
   <Config Name="Data Directory" Target="/app/data" Default="/mnt/user/appdata/openviking/data" Mode="rw" Description="Persistent workspace/data directory for OpenViking." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openviking/data</Config>
   <Config Name="Config File" Target="/app/ov.conf" Default="/mnt/user/appdata/openviking/ov.conf" Mode="rw" Description="Path to ov.conf on the host. Create this file before first start." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openviking/ov.conf</Config>
-
-  <Config Name="Enable VikingBot" Target="OPENVIKING_WITH_BOT" Default="1" Mode="" Description="Set to 0 to disable the bundled vikingbot startup." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Enable VikingBot" Target="OPENVIKING_WITH_BOT" Default="0" Mode="" Description="Set to 0 to disable the bundled vikingbot startup." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
 </Container>
