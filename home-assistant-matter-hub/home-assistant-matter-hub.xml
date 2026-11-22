@@ -2,41 +2,65 @@
 <Container version="2">
   <Name>home-assistant-matter-hub</Name>
   <Repository>ghcr.io/riddix/home-assistant-matter-hub:latest</Repository>
-  <Registry>https://github.com/riddix/home-assistant-matter-hub/pkgs/container/home-assistant-matter-hub</Registry>
+  <Registry>https://github.com/RiDDiX/home-assistant-matter-hub/pkgs/container/home-assistant-matter-hub</Registry>
   <Network>host</Network>
   <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
-  <Support>https://github.com/riddix/home-assistant-matter-hub</Support>
-  <Project>https://github.com/riddix/home-assistant-matter-hub</Project>
-  <Overview>This project simulates a Matter bridge to publish your Home Assistant entities to any Matter-compatible controller like Alexa, Apple Home, or Google Home.&#xD;
-&#xD;
-[span style='color: #E80000; font-weight: bold;']REQUIRED SETTINGS:[/span]&#xD;
-1. You MUST generate a "Long-Lived Access Token" in Home Assistant (User Profile &gt; Security).&#xD;
-2. Network Type MUST be set to [b]Host[/b].&#xD;
-3. IPv6 MUST be enabled in Unraid's Network Settings.&#xD;
-&#xD;
-[span style='color: #E80000; font-weight: bold;']TROUBLESHOOTING (Offline Devices / Issue #563):[/span]&#xD;
-If devices pair but show as "Offline" or "Not Responding", your Unraid host is likely dropping IPv6 packets on the bridge interface. This is common in Unraid 7+ or Docker 26+.&#xD;
-&#xD;
-[b]Fix:[/b] Run this command in the Unraid Terminal:&#xD;
-[code]ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT[/code]&#xD;
-(If this fixes it, add that command to the "User Scripts" plugin to run at array startup).</Overview>
-  <Category>HomeAutomation: Tools:</Category>
-  <WebUI>http://[IP]:[PORT:8482]</WebUI>
-  <TemplateURL/>
-  <Icon>https://github.com/ds-sebastian/unraid-templates/blob/main/icons/ha-matter-hub-icon.png?raw=true</Icon>
-  <ExtraParams>--restart unless-stopped</ExtraParams>
-  <PostArgs/>
+  <Support>https://github.com/RiDDiX/home-assistant-matter-hub/issues</Support>
+  <Project>https://github.com/RiDDiX/home-assistant-matter-hub</Project>
+  <ReadMe>https://riddix.github.io/home-assistant-matter-hub/</ReadMe>
+  <Overview>Home Assistant Matter Hub (HAMH) publishes your Home Assistant entities as Matter devices, so Apple Home, Google Home, Amazon Alexa, SmartThings and other Matter controllers can control them locally, with no cloud. This is the actively maintained RiDDiX fork (the original t0bst4r project is archived).
+
+**Required**
+
+1. Create a long-lived access token in Home Assistant (Profile &gt; Security &gt; Long-lived access tokens).
+2. Network type must be **Host**: Matter relies on mDNS and IPv6.
+3. IPv6 must be enabled in Unraid (Settings &gt; Network Settings &gt; IPv4 + IPv6) and on your router. For VLAN setups give your networks a ULA prefix (fd00::/48); link-local alone does not cross VLANs.
+4. Since v2.1, other devices get a 403 on the web UI unless you set a **Web UI Username and Password** below (both or neither). The web UI also accepts IP addresses and local names only; add your reverse proxy host name under Allowed Hosts.
+
+**Setup**
+
+Open the WebUI on port 8482, create a bridge, select entities by domain, label, area or pattern, then pair it with the QR code or pairing code in your Matter controller.
+
+**Troubleshooting**
+
+- Open **Health &amp; Diagnostics** in the web UI. The Network Diagnostics card checks interfaces and mDNS.
+- Devices pair but show as offline or not responding: limit mDNS to your LAN interface (mDNS Interface = br0 or eth0), and if your LAN has a global IPv6 address controllers cannot reach, set Strip Global IPv6 to true.
+- On some Unraid 7 / Docker 26+ systems the host drops IPv6 between bridge ports (issue #563). Test with `ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT` in the Unraid terminal; if it helps, add it to a User Scripts script that runs at array start.
+- Running an OpenThread Border Router on the same host can cause offline devices across VLANs; see the connectivity guide.
+
+Docs: https://riddix.github.io/home-assistant-matter-hub/ · Connectivity guide: https://riddix.github.io/home-assistant-matter-hub/guides/connectivity-issues</Overview>
+  <Category>HomeAutomation: Tools:Utilities</Category>
+  <ExtraSearchTerms>matter home assistant bridge apple home google home alexa homekit smartthings</ExtraSearchTerms>
+  <WebUI>http://[IP]:[PORT:8482]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/home-assistant-matter-hub/home-assistant-matter-hub.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/ha-matter-hub-icon.png</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <PostArgs></PostArgs>
   <CPUset/>
-  <DateInstalled/>
   <DonateText/>
   <DonateLink/>
-  <Requires/>
-  <Config Name="Home Assistant URL" Target="HAMH_HOME_ASSISTANT_URL" Default="http://YOUR_HA_IP:8123" Mode="" Description="Full URL including http/https and port." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="Access Token" Target="HAMH_HOME_ASSISTANT_ACCESS_TOKEN" Default="" Mode="" Description="Long-Lived Access Token from Home Assistant." Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="Storage Path" Target="/data" Default="/mnt/user/appdata/home-assistant-matter-hub" Mode="rw" Description="Persistent storage location." Type="Path" Display="always" Required="true" Mask="false"/>
-  <Config Name="WebUI Port" Target="HAMH_HTTP_PORT" Default="8482" Mode="" Description="Port for the web interface. Note: Changing this requires manually updating the WebUI link." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Log Level" Target="HAMH_LOG_LEVEL" Default="info" Mode="" Description="Options: silly, debug, info, warn, error." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="mDNS Interface" Target="HAMH_MDNS_NETWORK_INTERFACE" Default="" Mode="" Description="Optional: Force a specific interface for mDNS (e.g., br0 or eth0). Leave empty to auto-detect." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Requires>Home Assistant with a long-lived access token
+IPv6 enabled in Unraid and on your network</Requires>
+  <Changes>
+### 2026-11-22
+- Added web UI login (required for remote access since v2.1), allowed hosts, base path and mDNS options
+- Updated links, icon URL and troubleshooting
+- Added TemplateURL
+  </Changes>
+  <Config Name="Home Assistant URL" Target="HAMH_HOME_ASSISTANT_URL" Default="http://192.168.1.10:8123" Mode="" Description="Full Home Assistant URL with http/https and port. Replace the example IP." Type="Variable" Display="always" Required="true" Mask="false">http://192.168.1.10:8123</Config>
+  <Config Name="Access Token" Target="HAMH_HOME_ASSISTANT_ACCESS_TOKEN" Default="" Mode="" Description="Long-lived access token from Home Assistant." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="Data" Target="/data" Default="/mnt/user/appdata/home-assistant-matter-hub" Mode="rw" Description="Bridges, Matter fabrics and pairings. Back it up: losing it means re-pairing every controller." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/home-assistant-matter-hub</Config>
+  <Config Name="Web UI Username" Target="HAMH_HTTP_AUTH_USERNAME" Default="" Mode="" Description="Login for the web UI (no colons). Required for access from other devices since v2.1; set together with the password." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Web UI Password" Target="HAMH_HTTP_AUTH_PASSWORD" Default="" Mode="" Description="Password for the web UI. Set together with the username." Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="WebUI Port" Target="HAMH_HTTP_PORT" Default="8482" Mode="" Description="Web interface port (host network). If you change it, update the WebUI link in Advanced View too." Type="Variable" Display="advanced" Required="false" Mask="false">8482</Config>
+  <Config Name="Allowed Hosts" Target="HAMH_HTTP_ALLOWED_HOSTS" Default="" Mode="" Description="Extra host name for the web UI, e.g. matter.example.com or *.example.com (one value). IP addresses, localhost and .local/.lan/.home.arpa/.internal names always work." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Base Path" Target="HAMH_HTTP_BASE_PATH" Default="/" Mode="" Description="URL path when served under a sub-path by a reverse proxy, e.g. /matter." Type="Variable" Display="advanced" Required="false" Mask="false">/</Config>
+  <Config Name="mDNS Interface" Target="HAMH_MDNS_NETWORK_INTERFACE" Default="" Mode="" Description="Limit mDNS to your LAN interface (e.g. br0, eth0, bond0). Leave empty to use all interfaces." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Strip Global IPv6" Target="HAMH_MDNS_STRIP_GLOBAL_IPV6" Default="false|true" Mode="" Description="Do not advertise global IPv6 addresses over mDNS, so controllers use a locally reachable address." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Disable mDNS IPv4" Target="HAMH_MDNS_DISABLE_IPV4" Default="false|true" Mode="" Description="Advertise IPv6 only over mDNS." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Refresh Interval" Target="HAMH_HOME_ASSISTANT_REFRESH_INTERVAL" Default="60" Mode="" Description="Seconds between scans for new or changed Home Assistant entities." Type="Variable" Display="advanced" Required="false" Mask="false">60</Config>
+  <Config Name="Log Level" Target="HAMH_LOG_LEVEL" Default="info|debug|notice|warn|error|silly" Mode="" Description="Application log level." Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
+  <Config Name="Node Options" Target="NODE_OPTIONS" Default="" Mode="" Description="Optional Node.js flags, e.g. --max-old-space-size=768 to cap memory on small systems." Type="Variable" Display="advanced" Required="false" Mask="false"/>
 </Container>

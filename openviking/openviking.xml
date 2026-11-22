@@ -2,66 +2,71 @@
 <Container version="2">
   <Name>openviking</Name>
   <Repository>ghcr.io/volcengine/openviking:latest</Repository>
-  <Registry>https://github.com/volcengine/OpenViking</Registry>
+  <Registry>https://github.com/volcengine/OpenViking/pkgs/container/openviking</Registry>
   <Network>bridge</Network>
   <MyIP/>
+  <Shell>bash</Shell>
   <Privileged>false</Privileged>
   <Support>https://github.com/volcengine/OpenViking/issues</Support>
   <Project>https://github.com/volcengine/OpenViking</Project>
-  <Overview>[b]OpenViking[/b] is an open-source memory context database for AI agents.[br][br]
-[b]Container behavior:[/b][br]
-- Starts the OpenViking API server on port [b]1933[/b].[br]
-- Starts the Console UI on port [b]8020[/b].[br]
-- Starts the bundled [b]vikingbot[/b] by default.[br][br]
-[b]Important first-run requirement:[/b][br]
-Create the [code]ov.conf[/code] file [b]before starting the container[/b]. Mount it to [code]/app/ov.conf[/code].[br][br]
-If your config binds the server to [code]0.0.0.0[/code], you [b]must[/b] set [code]server.root_api_key[/code] or OpenViking will refuse to start.[br][br]
-[b]Suggested ov.conf example:[/b][br]
-[code]{
-  "server": {
-    "host": "0.0.0.0",
-    "port": 1933,
-    "root_api_key": "INSERT_API_KEY_HERE"
-  },
-  "storage": {
-    "workspace": "/app/data"
-  },
-  "log": {
-    "level": "INFO",
-    "output": "stdout"
-  },
-  "embedding": {
-    "dense": {
-      "backend": "openai",
-      "api_key": "",
-      "model": "",
-      "api_base": "",
-      "dimension": 1536
-    }
-  },
-  "vlm": {
-    "backend": "",
-    "api_key": "",
-    "model": "",
-    "api_base": "",
-    "temperature": 0.1,
-    "max_retries": 3
-  }
-}[/code][br][br]
-After startup, verify the API with [code]http://[IP]:1933/health[/code].</Overview>
-  <Category>AI: Tools:</Category>
-  <WebUI>http://[IP]:[PORT:8020]/</WebUI>
-  <TemplateURL/>
-  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/refs/heads/main/icons/ov-logo.png</Icon>
-  <ExtraParams>--restart=unless-stopped</ExtraParams>
-  <PostArgs>openviking-server</PostArgs>
+  <ReadMe>https://github.com/volcengine/OpenViking/blob/main/docs/en/guides/03-deployment.md</ReadMe>
+  <Overview>OpenViking is an open-source context database for AI agents by Volcengine. It stores memories, resources and skills in a file-system-like hierarchy (viking:// URIs) with tiered loading, semantic retrieval and automatic session memory. It is used by agents such as OpenClaw, Claude Code and Codex through its HTTP API, CLI, MCP server and SDKs.
+
+**What runs in the container**
+
+- The OpenViking HTTP API on port 1933, which also serves the **Web Studio** UI at `/studio`
+- The bundled VikingBot gateway (disable with Enable VikingBot = false)
+- Health check: `http://YOUR-SERVER-IP:1933/health`
+- Optional OpenViking LLM Gateway under `/gateway`: enable it in Studio (OpenViking Gateway page) or add a variable `OPENVIKING_GATEWAY_ENABLED=true`
+
+**First run: create ov.conf**
+
+All state lives in one folder mapped to `/app/.openviking`: `ov.conf`, `ovcli.conf` and the workspace (`./data` resolves to `/app/.openviking/data`). If `ov.conf` is missing, the container waits and answers every request with a 503 explaining what to do. Pick one:
+
+1. Run the wizard: `docker exec -it openviking openviking-server init`. The server starts by itself once the file exists.
+2. Or create `/mnt/user/appdata/openviking/ov.conf` yourself before starting. Minimal example:
+
+`{`
+`  "server": { "root_api_key": "CHANGE-ME-long-random-string" },`
+`  "storage": { "workspace": "./data" },`
+`  "embedding": { "dense": { "provider": "openai", "api_base": "https://api.openai.com/v1", "api_key": "sk-...", "model": "text-embedding-3-large", "dimension": 3072 } },`
+`  "vlm": { "provider": "openai", "api_base": "https://api.openai.com/v1", "api_key": "sk-...", "model": "gpt-4o-mini" }`
+`}`
+
+Because the server listens on 0.0.0.0 inside Docker, `server.root_api_key` (or another auth mode) is **required**, otherwise OpenViking refuses to start. The root key is an admin credential; create user keys for agents and for VikingBot (`bot.ov_server.api_key`). Providers such as Ollama, vLLM, Gemini, Volcengine and LiteLLM are supported; see the configuration guide.
+
+**Upgrading from an older template** (config at /app/ov.conf, data at /app/data): stop the container, move `ov.conf` into the new config folder, and move the old data folder to `/mnt/user/appdata/openviking/data` (keeping workspace `./data`), or keep an absolute workspace path and map it with an extra Path. The old port 8020 console was replaced by Web Studio at `/studio` on port 1933.
+
+Docs: https://github.com/volcengine/OpenViking/tree/main/docs/en</Overview>
+  <Category>AI: Tools:Utilities</Category>
+  <ExtraSearchTerms>memory context database agents rag mcp vikingbot openclaw</ExtraSearchTerms>
+  <WebUI>http://[IP]:[PORT:1933]/studio</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/openviking/openviking.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/ov-logo.png</Icon>
+  <ExtraParams/>
+  <PostArgs/>
   <CPUset/>
   <DonateText/>
   <DonateLink/>
-  <Requires/>
-
-  <Config Name="API Port" Target="1933" Default="1933" Mode="tcp" Description="OpenViking API server port." Type="Port" Display="always" Required="true" Mask="false">1933</Config>
-  <Config Name="Data Directory" Target="/app/data" Default="/mnt/user/appdata/openviking/data" Mode="rw" Description="Persistent workspace/data directory for OpenViking." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openviking/data</Config>
-  <Config Name="Config File" Target="/app/ov.conf" Default="/mnt/user/appdata/openviking/ov.conf" Mode="rw" Description="Path to ov.conf on the host. Create this file before first start." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openviking/ov.conf</Config>
-  <Config Name="Enable VikingBot" Target="OPENVIKING_WITH_BOT" Default="0" Mode="" Description="Set to 0 to disable the bundled vikingbot startup." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Requires>An ov.conf with server.root_api_key plus an embedding model and a VLM (OpenAI-compatible, Ollama, Gemini, Volcengine and more)</Requires>
+  <Changes>
+### 2026-11-22
+- Moved config and data to the single /app/.openviking folder used by current images (see the upgrade note)
+- Removed the openviking-server post argument so the entrypoint's first-run handling, host binding and VikingBot start work again
+- WebUI now opens Web Studio on port 1933 (/studio); the 8020 console no longer exists
+- Added ov.conf bootstrap, server host/port and public base URL variables, and documented the gateway
+- Added the template URL and fixed the registry link
+### 2026-04-10
+- Fixed XML formatting and the VikingBot setting
+### 2026-04-09
+- Initial release
+  </Changes>
+  <Config Name="API / Web Studio Port" Target="1933" Default="1933" Mode="tcp" Description="OpenViking HTTP API, MCP and Web Studio (/studio). Must match Server Port if you change it." Type="Port" Display="always" Required="true" Mask="false">1933</Config>
+  <Config Name="Config and Data" Target="/app/.openviking" Default="/mnt/user/appdata/openviking" Mode="rw" Description="Holds ov.conf, ovcli.conf and the default workspace (data/). Create ov.conf here or run openviking-server init." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openviking</Config>
+  <Config Name="Enable VikingBot" Target="OPENVIKING_WITH_BOT" Default="1|0" Mode="" Description="1 starts the bundled VikingBot gateway with the server. Set 0 for a server-only deployment. VikingBot needs a user/admin key in bot.ov_server.api_key." Type="Variable" Display="always" Required="false" Mask="false">1</Config>
+  <Config Name="ov.conf Content (first run)" Target="OPENVIKING_CONF_CONTENT" Default="" Mode="" Description="Optional. Full ov.conf JSON on one line. Written to /app/.openviking/ov.conf only if that file does not exist yet. You can clear it after the first start." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Server Host" Target="OPENVIKING_SERVER_HOST" Default="0.0.0.0" Mode="" Description="Bind address inside the container. Keep 0.0.0.0 for Docker port mapping." Type="Variable" Display="advanced" Required="false" Mask="false">0.0.0.0</Config>
+  <Config Name="Server Port" Target="OPENVIKING_SERVER_PORT" Default="1933" Mode="" Description="Port inside the container. Overrides server.port in ov.conf; change the port mapping too if you change this." Type="Variable" Display="advanced" Required="false" Mask="false">1933</Config>
+  <Config Name="Public Base URL" Target="OPENVIKING_PUBLIC_BASE_URL" Default="" Mode="" Description="Public HTTPS URL when exposed through a reverse proxy, e.g. https://ov.example.com (needed for OAuth and internet MCP clients)." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Startup Health Attempts" Target="OPENVIKING_HEALTH_MAX_ATTEMPTS" Default="120" Mode="" Description="Seconds the entrypoint waits for the server to become healthy before giving up." Type="Variable" Display="advanced" Required="false" Mask="false">120</Config>
 </Container>

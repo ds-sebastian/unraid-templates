@@ -7,40 +7,55 @@
   <MyIP/>
   <Shell>bash</Shell>
   <Privileged>false</Privileged>
-  <Support>https://github.com/remsky/Kokoro-FastAPI/discussions/230</Support>
+  <Support>https://github.com/remsky/Kokoro-FastAPI/issues</Support>
   <Project>https://github.com/remsky/Kokoro-FastAPI</Project>
-  <Overview>Kokoro-FastAPI is a Dockerized FastAPI wrapper for the Kokoro-82M text-to-speech model, optimized for speed and quality.[br][br]&#xD;
-  &#xD;
-  [b]Features:[/b][br]&#xD;
-  - High-quality Japanese and English text-to-speech.[br]&#xD;
-  - Accelerated inference using NVIDIA GPUs.[br]&#xD;
-  - OpenAI-compatible speech endpoint.[br]&#xD;
-  [br]&#xD;
-  [b]Home Assistant Integration:[/b][br]&#xD;
-  This container is fully compatible with the [b]OpenAI TTS[/b] integration in Home Assistant. You can generate local, OpenAI-level quality voice audio using your own GPU.[br]&#xD;
-  1. Install the OpenAI TTS integration (via HACS).[br]&#xD;
-  2. Set the "API Key" to any random text (e.g., "123").[br]&#xD;
-  3. Set the "Target URL" to: [b]http://[IP]:8880/v1[/b][br]&#xD;
-  [br]&#xD;
-  [b]Requirements:[/b][br]&#xD;
-  - Requires the [b]Nvidia Driver[/b] plugin.[br]&#xD;
-  - This container runs as internal user [b]1001[/b]. Ensure your "Temp Files" output directory is writable by this user.[br]&#xD;
-  - The WebUI is located at [b]/web[/b].</Overview>
-  <Category>AI: Tools:Utilities</Category>
+  <ReadMe>https://github.com/remsky/Kokoro-FastAPI/blob/master/README.md</ReadMe>
+  <Overview>Kokoro-FastAPI serves the Kokoro-82M text-to-speech model behind an OpenAI-compatible speech API (/v1/audio/speech), accelerated on an NVIDIA GPU. It is fast and natural sounding, supports English, Japanese, Chinese, Spanish, French, Hindi, Italian and Portuguese voices, voice mixing, streaming, timestamps and SSML, and includes a web player at /web. Models are baked into the image.
+
+**Requirements**
+
+- The **Nvidia Driver** plugin. Pick your GPU with NVIDIA_VISIBLE_DEVICES (all, or a GPU UUID from the plugin page).
+- GTX 900-series through RTX 40-series: use the default `:latest` tag. **RTX 50-series (Blackwell):** change the repository to `ghcr.io/remsky/kokoro-fastapi-gpu:latest-cu128`. Upstream recommends pinning a release tag (e.g. `:v0.4.x`) for stable use. No NVIDIA GPU: use `ghcr.io/remsky/kokoro-fastapi-cpu:latest` instead.
+
+**Home Assistant**
+
+Install the **OpenAI TTS** integration from HACS (https://github.com/sfortis/openai_tts), choose the **Kokoro-FastAPI** preset and point it at `http://YOUR-SERVER-IP:8880`. The voice list is read from the server. Wyoming users can use wyoming_openai instead. Open WebUI, SillyTavern and other OpenAI-compatible clients work with base URL `http://YOUR-SERVER-IP:8880/v1`.
+
+**Notes**
+
+- The API has no authentication by default. Set API Keys (a JSON list) if the port is reachable beyond your LAN; the web player then needs a key too.
+- The container runs as UID 1001. The optional download-links folder must be writable by it: `mkdir -p /mnt/user/appdata/kokoro-tts/temp` then `chown 1001:1001 /mnt/user/appdata/kokoro-tts/temp`.
+- All variables: https://github.com/remsky/Kokoro-FastAPI/blob/master/docs/configuration.md</Overview>
+  <Category>AI: HomeAutomation: Tools:Utilities</Category>
+  <ExtraSearchTerms>kokoro tts text to speech openai speech api nvidia gpu cuda voice home assistant</ExtraSearchTerms>
   <WebUI>http://[IP]:[PORT:8880]/web</WebUI>
-  <TemplateURL/>
-  <Icon>https://github.com/ds-sebastian/unraid-templates/blob/main/icons/kokoro-icon.png?raw=true</Icon>
-  <ExtraParams>--gpus all --restart=unless-stopped</ExtraParams>
-  <PostArgs/>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/kokoro-tts-gpu/kokoro-tts-gpu.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/kokoro-icon.png</Icon>
+  <ExtraParams>--runtime=nvidia --restart=unless-stopped</ExtraParams>
+  <PostArgs></PostArgs>
   <CPUset/>
-  <DateInstalled/>
   <DonateText/>
   <DonateLink/>
-  <Requires>Nvidia Driver</Requires>
-  <Config Name="WebUI Port" Target="8880" Default="8880" Mode="tcp" Description="Port for the FastAPI server." Type="Port" Display="always" Required="true" Mask="false">8880</Config>
-  <Config Name="Temp Files (Audio Output)" Target="/app/api/temp_files" Default="/mnt/user/appdata/kokoro-tts/temp" Mode="rw" Description="Directory where generated audio files are saved. MUST be writable by UID 1001." Type="Path" Display="always" Required="false" Mask="false"/>
-  <Config Name="NVIDIA_VISIBLE_DEVICES" Target="NVIDIA_VISIBLE_DEVICES" Default="all" Mode="" Description="GPU UUID to pass to the container (or 'all')." Type="Variable" Display="always" Required="true" Mask="false">all</Config>
-  <Config Name="NVIDIA_DRIVER_CAPABILITIES" Target="NVIDIA_DRIVER_CAPABILITIES" Default="all" Mode="" Description="Nvidia driver capabilities." Type="Variable" Display="advanced" Required="false" Mask="false">all</Config>
-  <Config Name="Use GPU" Target="USE_GPU" Default="true" Mode="" Description="Explicitly enable GPU usage." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
-  <Config Name="Device Type" Target="DEVICE" Default="gpu" Mode="" Description="Set inference device (gpu or cpu)." Type="Variable" Display="advanced" Required="false" Mask="false">gpu</Config>
+  <Requires>Nvidia Driver plugin and an NVIDIA GPU (use the cpu image otherwise)</Requires>
+  <Changes>
+### 2026-11-22
+- Fixed the device variable: upstream reads DEVICE_TYPE (cuda/cpu); DEVICE=gpu was ignored
+- Added API keys, default voice, idle unload, CORS, workers and log level variables
+- Documented the RTX 50-series (cu128) tag and the Home Assistant OpenAI TTS preset
+- Switched to --runtime=nvidia, as other Unraid Nvidia templates do
+- Added TemplateURL and fixed links
+  </Changes>
+  <Config Name="WebUI / API Port" Target="8880" Default="8880" Mode="tcp" Description="Web player at /web, API at /v1, docs at /docs." Type="Port" Display="always" Required="true" Mask="false">8880</Config>
+  <Config Name="NVIDIA Visible Devices" Target="NVIDIA_VISIBLE_DEVICES" Default="all" Mode="" Description="GPU UUID to use (from the Nvidia Driver plugin page) or all." Type="Variable" Display="always" Required="true" Mask="false">all</Config>
+  <Config Name="NVIDIA Driver Capabilities" Target="NVIDIA_DRIVER_CAPABILITIES" Default="compute,utility" Mode="" Description="Driver features exposed to the container. compute,utility is enough for inference." Type="Variable" Display="advanced" Required="true" Mask="false">compute,utility</Config>
+  <Config Name="Default Voice" Target="DEFAULT_VOICE" Default="af_heart" Mode="" Description="Voice used when a request names none; also preselected in the web player. Mixes like af_bella+af_sky work." Type="Variable" Display="always" Required="false" Mask="false">af_heart</Config>
+  <Config Name="API Keys" Target="API_KEYS" Default="[]" Mode="" Description='JSON list of accepted keys, e.g. ["key-one","key-two"]. [] = no authentication. When set, API and websocket routes need Authorization: Bearer KEY; /health and the docs stay open. Never leave it empty, which stops the server.' Type="Variable" Display="always" Required="false" Mask="true">[]</Config>
+  <Config Name="Download Links Folder" Target="/app/api/temp_files" Default="/mnt/user/appdata/kokoro-tts/temp" Mode="rw" Description="Optional. Audio files created with return_download_link. Must be writable by UID 1001 (see Overview)." Type="Path" Display="advanced" Required="false" Mask="false">/mnt/user/appdata/kokoro-tts/temp</Config>
+  <Config Name="Use GPU" Target="USE_GPU" Default="true|false" Mode="" Description="Use the GPU when one is available." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Device Type" Target="DEVICE_TYPE" Default="" Mode="" Description="Force the device: cuda or cpu. Leave empty to auto-detect." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Idle Unload (seconds)" Target="MODEL_AUTO_UNLOAD_TIMEOUT_SECONDS" Default="0" Mode="" Description="Unload the model from VRAM after this many idle seconds; 0 keeps it loaded." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Web Player" Target="ENABLE_WEB_PLAYER" Default="true|false" Mode="" Description="Serve the browser UI at /web." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="CORS Origins" Target="CORS_ORIGINS" Default='["*"]' Mode="" Description="JSON list of allowed browser origins. Narrow it if the port is reachable beyond your LAN." Type="Variable" Display="advanced" Required="false" Mask="false">["*"]</Config>
+  <Config Name="Workers" Target="WEB_CONCURRENCY" Default="1" Mode="" Description="uvicorn worker processes. Each loads its own model copy into VRAM." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Log Level" Target="API_LOG_LEVEL" Default="INFO|DEBUG|WARNING|ERROR" Mode="" Description="Log level." Type="Variable" Display="advanced" Required="false" Mask="false">INFO</Config>
 </Container>
