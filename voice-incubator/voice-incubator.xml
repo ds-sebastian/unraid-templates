@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>voice-incubator</Name>
+  <Repository>ghcr.io/ohf-voice/voice-incubator:latest</Repository>
+  <Registry>https://github.com/OHF-Voice/voice-incubator/pkgs/container/voice-incubator</Registry>
+  <Network>host</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/OHF-Voice/voice-incubator/issues</Support>
+  <Project>https://github.com/OHF-Voice/voice-incubator</Project>
+  <ReadMe>https://github.com/OHF-Voice/voice-incubator/blob/main/README.md</ReadMe>
+  <Overview>Voice Incubator is the Open Home Foundation's experimental local voice assistant for Home Assistant. It runs speech recognition (Parakeet), text-to-speech (Piper), command matching, speaker identification, custom wake words and timers fully on your server, for Home Assistant Voice PE satellites and any Assist pipeline over the Wyoming protocol. Upstream says: experimental and not supported.
+
+**Setup**
+
+1. In Home Assistant create a long-lived access token for an **admin** user (Profile &gt; Security). The app sets up its own integration, so a non-admin token is not enough.
+2. Fill in the Home Assistant URL and token and start the container. The first start downloads about 500 MB of models; the WebUI on port 8099 shows the progress.
+3. In Home Assistant install the **Voice Incubator** integration (HACS / Marketplace &gt; custom repository `https://github.com/OHF-Voice/integration-voice-incubator`). The app configures it the next time it connects. It adds satellite devices, timers and per-area switches.
+4. Satellites: flash a Home Assistant Voice PE with the incubator firmware (https://ohf-voice.github.io/firmware-voice-incubator/voice-pe/). It is found automatically by mDNS.
+5. Other satellites, phones and typed Assist: add the **Wyoming Protocol** integration with your Unraid IP and port 10800, then pick Voice Incubator as speech-to-text, text-to-speech and/or conversation agent in Settings &gt; Voice assistants.
+
+**Options (Post Arguments)**
+
+Every setting except the Home Assistant URL/token is a command-line flag in Post Arguments. The default `--language en --wake-words-dir /data/wake_words` sets the language (en, de, es, fr, it, nl, pl, ru, uk) and keeps custom wake words in appdata (otherwise they are lost on update). Other useful flags: `--host SATELLITE-IP` (pin one satellite, needed without host networking), `--threads 4`, `--silence 1.0`, `--no-speaker-id`, `--wyoming-port 0` (disable Wyoming), `--debug`. Full list: https://github.com/OHF-Voice/voice-incubator#standalone
+
+**Notes**
+
+- Host networking is needed for mDNS satellite discovery. In bridge mode, add the ports and pin a satellite with `--host`.
+- **Security:** the WebUI and Wyoming port have no authentication, and the WebUI can run actions in Home Assistant with the admin token. Keep it on a trusted LAN/VLAN and never expose it to the internet. To keep the WebUI local only, add `--http-host 127.0.0.1` to Post Arguments.
+- Storage: about 1 GB; optional wake-word training adds about 4 GB. CPU only.
+
+Guide: https://github.com/OHF-Voice/integration-voice-incubator/blob/main/GUIDE.md</Overview>
+  <Category>HomeAutomation: AI: Tools:Utilities</Category>
+  <ExtraSearchTerms>home assistant voice assist wyoming stt tts piper parakeet wake word satellite voice pe nabu</ExtraSearchTerms>
+  <WebUI>http://[IP]:[PORT:8099]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/voice-incubator/voice-incubator.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/OHF-Voice/app-voice-incubator/main/voice_incubator/icon.png</Icon>
+  <ExtraParams>--stop-timeout=30</ExtraParams>
+  <PostArgs>--language en --wake-words-dir /data/wake_words</PostArgs>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>Home Assistant 2025.10 or newer with an admin long-lived access token
+The Voice Incubator integration (HACS custom repository)</Requires>
+  <Changes>
+### 2026-11-22
+- Initial release
+  </Changes>
+  <Config Name="Home Assistant URL" Target="HASS_URL" Default="http://192.168.1.10:8123" Mode="" Description="Home Assistant address as this container reaches it. Replace the example IP." Type="Variable" Display="always" Required="true" Mask="false">http://192.168.1.10:8123</Config>
+  <Config Name="Home Assistant Token" Target="HASS_TOKEN" Default="" Mode="" Description="Long-lived access token of an admin user (Profile &gt; Security &gt; Long-lived access tokens)." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="Data" Target="/data" Default="/mnt/user/appdata/voice-incubator" Mode="rw" Description="Commands, names, satellites, speaker profiles, settings, custom wake words and downloaded models (about 1 GB, +4 GB with wake-word training)." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/voice-incubator</Config>
+  <Config Name="WebUI Port" Target="8099" Default="8099" Mode="tcp" Description="Web interface and /health. With host networking it listens on this port directly (change with --http-port in Post Arguments; the health check expects 8099)." Type="Port" Display="advanced" Required="false" Mask="false">8099</Config>
+  <Config Name="Wyoming Port" Target="10800" Default="10800" Mode="tcp" Description="Wyoming STT/TTS/conversation agent for Home Assistant pipelines. With host networking change it with --wyoming-port." Type="Port" Display="advanced" Required="false" Mask="false">10800</Config>
+</Container>

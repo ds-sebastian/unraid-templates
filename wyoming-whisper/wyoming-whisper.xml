@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>wyoming-whisper</Name>
+  <Repository>rhasspy/wyoming-whisper:latest</Repository>
+  <Registry>https://hub.docker.com/r/rhasspy/wyoming-whisper</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/OHF-Voice/wyoming-faster-whisper/issues</Support>
+  <Project>https://github.com/OHF-Voice/wyoming-faster-whisper</Project>
+  <ReadMe>https://github.com/OHF-Voice/wyoming-faster-whisper/blob/main/README.md</ReadMe>
+  <Overview>Wyoming Faster Whisper is the official Home Assistant speech-to-text server (the same engine as the Whisper add-on) for Assist voice pipelines, using the Wyoming protocol. Despite the name it includes several engines: faster-whisper (100 languages), NVIDIA Parakeet through sherpa-onnx (fast and accurate on CPU), Qwen3-ASR, GigaAM and Hugging Face transformers.
+
+**Setup**
+
+1. Start the container. The first start downloads the model into the Data folder (allow a few minutes; the health check waits 5 minutes).
+2. In Home Assistant go to Settings &gt; Devices &amp; services &gt; Add integration &gt; **Wyoming Protocol**, and enter your Unraid IP and port 10300.
+3. Settings &gt; Voice assistants &gt; your assistant &gt; Speech-to-text: pick faster-whisper and your language.
+
+**Choosing a model**
+
+Leave Library and Model on `auto` for good defaults. For English, auto uses Parakeet TDT 0.6b v2 via sherpa-onnx, one of the best CPU options. For most other languages it uses faster-whisper `base-int8`. Better accuracy for other languages: `small-int8` or `medium-int8`, Parakeet v3 (`sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8`, 25 European languages), `rhasspy/qwen3-asr-0.6b-onnx-int4-merged` (Qwen3-ASR, 31 languages), or any faster-whisper model from Hugging Face such as `Systran/faster-distil-whisper-small.en`. Bigger models are slower and need more RAM.
+
+**Configuration**
+
+Every command-line option has a `WYO_WHISPER_*` variable (option name in capitals, dashes as underscores); the most useful ones are below. Add others with "Add another Path, Port, Variable", for example `WYO_WHISPER_VAD_CLIP` (trim silence before transcription; set to e.g. `sherpa` or `faster-whisper`) or `WYO_WHISPER_ZEROCONF` (mDNS discovery, needs host networking). Do not add those two empty: an empty value turns them on. Change the port with the port mapping (or `WYO_WHISPER_URI`), not Post Arguments, so the health check keeps working.
+
+**GPU:** the published image is CPU only (amd64 and arm64). A CUDA image can be built from `Dockerfile.gpu` in the repository.
+
+Home Assistant docs: https://www.home-assistant.io/integrations/wyoming/</Overview>
+  <Category>HomeAutomation: AI: Tools:Utilities</Category>
+  <ExtraSearchTerms>home assistant whisper faster-whisper parakeet stt speech to text wyoming assist voice rhasspy</ExtraSearchTerms>
+  <WebUI></WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/wyoming-whisper/wyoming-whisper.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/home-assistant/addons/master/whisper/icon.png</Icon>
+  <ExtraParams></ExtraParams>
+  <PostArgs></PostArgs>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>Home Assistant with the Wyoming Protocol integration</Requires>
+  <Changes>
+### 2026-11-22
+- Initial release
+  </Changes>
+  <Config Name="Wyoming Port" Target="10300" Default="10300" Mode="tcp" Description="Wyoming protocol port. Add it in Home Assistant as host = your Unraid IP, port = this value." Type="Port" Display="always" Required="true" Mask="false">10300</Config>
+  <Config Name="Data" Target="/data" Default="/mnt/user/appdata/wyoming-whisper" Mode="rw" Description="Downloaded models and caches. Several GB for large models." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/wyoming-whisper</Config>
+  <Config Name="Language" Target="WYO_WHISPER_LANGUAGE" Default="auto" Mode="" Description="Default language code, e.g. en, de, fr, or auto. Home Assistant also sends the pipeline language with every request." Type="Variable" Display="always" Required="false" Mask="false">auto</Config>
+  <Config Name="STT Library" Target="WYO_WHISPER_STT_LIBRARY" Default="auto|faster-whisper|sherpa|qwen3-asr|onnx-asr|transformers" Mode="" Description="Speech engine. auto picks one by language (English = sherpa/Parakeet)." Type="Variable" Display="always" Required="false" Mask="false">auto</Config>
+  <Config Name="Model" Target="WYO_WHISPER_MODEL" Default="auto" Mode="" Description="auto, tiny-int8, base-int8, small-int8, medium-int8, a sherpa-onnx model id (e.g. sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8) or a Hugging Face repo (e.g. Systran/faster-whisper-large-v3)." Type="Variable" Display="always" Required="false" Mask="false">auto</Config>
+  <Config Name="CPU Threads" Target="WYO_WHISPER_CPU_THREADS" Default="4" Mode="" Description="Threads for faster-whisper, sherpa-onnx and qwen3-asr." Type="Variable" Display="always" Required="false" Mask="false">4</Config>
+  <Config Name="Beam Size" Target="WYO_WHISPER_BEAM_SIZE" Default="0" Mode="" Description="Decoding beam size. 0 = auto (1 on ARM, 5 otherwise). Lower is faster." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Compute Type" Target="WYO_WHISPER_COMPUTE_TYPE" Default="default" Mode="" Description="faster-whisper only: default, int8, int8_float16, float16 or float32." Type="Variable" Display="advanced" Required="false" Mask="false">default</Config>
+  <Config Name="Initial Prompt" Target="WYO_WHISPER_INITIAL_PROMPT" Default="" Mode="" Description="Optional text to bias recognition (faster-whisper, qwen3-asr). Breaks Distil-Whisper models." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Whisper Task" Target="WYO_WHISPER_WHISPER_TASK" Default="transcribe|translate" Mode="" Description="transcribe, or translate speech to English (Whisper models)." Type="Variable" Display="advanced" Required="false" Mask="false">transcribe</Config>
+  <Config Name="VAD Filter" Target="WYO_WHISPER_VAD_FILTER" Default="false|true" Mode="" Description="faster-whisper only: Silero voice activity filter, reduces hallucinations on silence." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="VAD Endpointing (seconds)" Target="WYO_WHISPER_VAD_ENDPOINTING" Default="" Mode="" Description="Optional, e.g. 0.7: the server ends the command after this much silence instead of waiting for Home Assistant." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Sherpa Streaming" Target="WYO_WHISPER_SHERPA_STREAMING" Default="false|true" Mode="" Description="True streaming recognition with a streaming sherpa model (Kroko zipformer, en/de/es/fr)." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Home Assistant Token" Target="WYO_WHISPER_HASS_TOKEN" Default="" Mode="" Description="Optional admin long-lived token. Biases recognition toward the names of your exposed entities, areas and floors (faster-whisper and qwen3-asr)." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Home Assistant API URL" Target="WYO_WHISPER_HASS_API" Default="http://homeassistant.local:8123/api" Mode="" Description="Home Assistant API URL for name biasing (must end in /api)." Type="Variable" Display="advanced" Required="false" Mask="false">http://homeassistant.local:8123/api</Config>
+  <Config Name="Local Files Only" Target="WYO_WHISPER_LOCAL_FILES_ONLY" Default="false|true" Mode="" Description="Never download models; fail if the model is missing (offline use)." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Debug" Target="WYO_WHISPER_DEBUG" Default="false|true" Mode="" Description="Debug logging." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+</Container>
