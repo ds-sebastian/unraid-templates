@@ -35,7 +35,7 @@ Guide: https://github.com/OHF-Voice/integration-voice-incubator/blob/main/GUIDE.
   <ExtraSearchTerms>home assistant voice assist wyoming stt tts piper parakeet wake word satellite voice pe nabu</ExtraSearchTerms>
   <WebUI>http://[IP]:[PORT:8099]/</WebUI>
   <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/voice-incubator/voice-incubator.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/OHF-Voice/app-voice-incubator/main/voice_incubator/icon.png</Icon>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/voice-incubator.png</Icon>
   <ExtraParams>--stop-timeout=30</ExtraParams>
   <PostArgs>--language en --wake-words-dir /data/wake_words</PostArgs>
   <CPUset/>

@@ -33,7 +33,7 @@ Home Assistant docs: https://www.home-assistant.io/integrations/wyoming/</Overvi
   <ExtraSearchTerms>home assistant whisper faster-whisper parakeet stt speech to text wyoming assist voice rhasspy</ExtraSearchTerms>
   <WebUI></WebUI>
   <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/wyoming-whisper/wyoming-whisper.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/home-assistant/addons/master/whisper/icon.png</Icon>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/wyoming-whisper.png</Icon>
   <ExtraParams></ExtraParams>
   <PostArgs></PostArgs>
   <CPUset/>

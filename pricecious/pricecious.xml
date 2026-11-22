@@ -36,7 +36,7 @@
   <Category>Tools:Utilities AI:</Category>
   <WebUI>http://[IP]:[PORT:8000]/</WebUI>
   <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/pricecious/pricecious.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/ds-sebastian/pricecious/main/frontend/public/apple-touch-icon.png</Icon>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/pricecious.png</Icon>
   <ExtraParams>--add-host=host.docker.internal:host-gateway</ExtraParams>
   <PostArgs/>
   <CPUset/>

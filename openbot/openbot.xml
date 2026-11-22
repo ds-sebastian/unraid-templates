@@ -43,7 +43,7 @@ Docker guide: https://github.com/nightly-labs/openbot/blob/main/docs/docker.md</
   <ExtraSearchTerms>ai agents claude code codex gemini opencode computer use self-hosted server</ExtraSearchTerms>
   <WebUI></WebUI>
   <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/openbot/openbot.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/nightly-labs/openbot/main/apps/auth-api/public/icon-512x512.png</Icon>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/openbot.png</Icon>
   <ExtraParams>--security-opt seccomp=/mnt/user/appdata/openbot/seccomp.json --security-opt no-new-privileges:true --shm-size=1g --stop-timeout=60 --restart=unless-stopped</ExtraParams>
   <PostArgs></PostArgs>
   <CPUset/>

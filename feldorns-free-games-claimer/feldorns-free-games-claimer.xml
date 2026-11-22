@@ -41,7 +41,7 @@ Multiple accounts: run one container per account, each with its own appdata fold
   <ExtraSearchTerms>free games claimer fgc epic gog steam prime gaming luna amazon microsoft rewards feldorn vogler</ExtraSearchTerms>
   <WebUI>http://[IP]:[PORT:7080]/</WebUI>
   <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/feldorns-free-games-claimer/feldorns-free-games-claimer.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/feldorn/free-games-claimer/main/assets/icon-256.png</Icon>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/feldorns-free-games-claimer.png</Icon>
   <ExtraParams>--shm-size=512m</ExtraParams>
   <PostArgs/>
   <CPUset/>
