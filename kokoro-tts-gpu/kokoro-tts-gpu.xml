@@ -19,11 +19,11 @@
 
 **Home Assistant**
 
-Install the **OpenAI TTS** integration from HACS (https://github.com/sfortis/openai_tts), choose the **Kokoro-FastAPI** preset and point it at `http://YOUR-SERVER-IP:8880`. The voice list is read from the server. Wyoming users can use wyoming_openai instead. Open WebUI, SillyTavern and other OpenAI-compatible clients work with base URL `http://YOUR-SERVER-IP:8880/v1`.
+Install the **OpenAI TTS** integration from HACS (https://github.com/sfortis/openai_tts), choose the **Kokoro-FastAPI** preset and set the URL to `http://YOUR-SERVER-IP:8880/v1/audio/speech` (the preset fills in localhost). The voice list is read from the server. Wyoming users can use wyoming_openai instead. Open WebUI, SillyTavern and other OpenAI-compatible clients work with base URL `http://YOUR-SERVER-IP:8880/v1`.
 
 **Notes**
 
-- The API has no authentication by default. Set API Keys (a JSON list) if the port is reachable beyond your LAN; the web player then needs a key too.
+- The API has no authentication by default. Set API Keys (a JSON list) if the port is reachable beyond your LAN; the built-in web player still loads but sends no key, so it can no longer generate audio.
 - The container runs as UID 1001. The optional download-links folder must be writable by it: `mkdir -p /mnt/user/appdata/kokoro-tts/temp` then `chown 1001:1001 /mnt/user/appdata/kokoro-tts/temp`.
 - All variables: https://github.com/remsky/Kokoro-FastAPI/blob/master/docs/configuration.md</Overview>
   <Category>AI: HomeAutomation: Tools:Utilities</Category>

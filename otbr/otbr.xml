@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>OpenThread-Border-Router</Name>
-  <Repository>openthread/border-router:latest</Repository>
+  <Repository>openthread/border-router:stable</Repository>
   <Registry>https://hub.docker.com/r/openthread/border-router</Registry>
   <Network>host</Network>
   <MyIP/>
@@ -42,6 +42,8 @@ Unraid resets these at reboot and when DHCP renews the interface, so put them in
 
 Add the **OpenThread Border Router** integration with URL `http://YOUR-SERVER-IP:8081`, then the **Thread** integration. Under Settings &gt; Devices &gt; Thread, form a network or make this the preferred network and send the credentials to your phone for Matter commissioning. Phones and Home Assistant must be able to route IPv6 to your LAN.
 
+**Image tag:** `stable` is the monthly release (vYYYY.MM.0). `latest` is rebuilt on every commit and can break, so use it only to test a fix. Pin a version (e.g. `openthread/border-router:v2026.11.0`) if you want to control upgrades.
+
 **Security:** the REST API (port 8081) and web UI have no authentication and can change or read the Thread network key. Keep them on your LAN; set OT_REST_LISTEN_ADDR to 127.0.0.1 if Home Assistant also runs in host network mode on this server.
 
 Docs: https://openthread.io/guides/border-router/docker · Home Assistant: https://www.home-assistant.io/integrations/otbr/</Overview>
@@ -74,5 +76,4 @@ Unraid IPv6 enabled and the host sysctls from the Overview applied</Requires>
   <Config Name="Log Level" Target="OT_LOG_LEVEL" Default="4" Mode="" Description="otbr-agent log level 0-7 (4 = warning, 6 = info, 7 = debug, very noisy)." Type="Variable" Display="advanced" Required="false" Mask="false">4</Config>
   <Config Name="Vendor Name" Target="OT_VENDOR_NAME" Default="Unraid" Mode="" Description="Vendor name advertised over mDNS and shown in Home Assistant." Type="Variable" Display="advanced" Required="false" Mask="false">Unraid</Config>
   <Config Name="Model Name" Target="OT_VENDOR_MODEL" Default="Thread Border Router" Mode="" Description="Model name advertised over mDNS and shown in Home Assistant." Type="Variable" Display="advanced" Required="false" Mask="false">Thread Border Router</Config>
-  <Config Name="Firewall Backend" Target="OTBR_NFTABLES" Default="" Mode="" Description="Leave empty for the image's default. 1 = manage the ingress filter and NAT44 in otbr-agent (nftables); 0 = legacy ip6tables/ipset rules." Type="Variable" Display="advanced" Required="false" Mask="false"/>
 </Container>

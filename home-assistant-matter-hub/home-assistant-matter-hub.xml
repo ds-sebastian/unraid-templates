@@ -27,7 +27,7 @@ Open the WebUI on port 8482, create a bridge, select entities by domain, label, 
 
 - Open **Health &amp; Diagnostics** in the web UI. The Network Diagnostics card checks interfaces and mDNS.
 - Devices pair but show as offline or not responding: limit mDNS to your LAN interface (mDNS Interface = br0 or eth0), and if your LAN has a global IPv6 address controllers cannot reach, set Strip Global IPv6 to true.
-- On some Unraid 7 / Docker 26+ systems the host drops IPv6 between bridge ports (issue #563). Test with `ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT` in the Unraid terminal; if it helps, add it to a User Scripts script that runs at array start.
+- If Home Assistant runs as an Unraid VM (or in a br0 container) and its devices go offline, the host may be dropping IPv6 forwarded across br0. Test with `ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT` in the Unraid terminal; if it helps, add it to a User Scripts script that runs at array start. This does not affect the Matter Hub container itself, which uses host networking.
 - Running an OpenThread Border Router on the same host can cause offline devices across VLANs; see the connectivity guide.
 
 Docs: https://riddix.github.io/home-assistant-matter-hub/ · Connectivity guide: https://riddix.github.io/home-assistant-matter-hub/guides/connectivity-issues</Overview>
@@ -61,6 +61,6 @@ IPv6 enabled in Unraid and on your network</Requires>
   <Config Name="Strip Global IPv6" Target="HAMH_MDNS_STRIP_GLOBAL_IPV6" Default="false|true" Mode="" Description="Do not advertise global IPv6 addresses over mDNS, so controllers use a locally reachable address." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
   <Config Name="Disable mDNS IPv4" Target="HAMH_MDNS_DISABLE_IPV4" Default="false|true" Mode="" Description="Advertise IPv6 only over mDNS." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
   <Config Name="Refresh Interval" Target="HAMH_HOME_ASSISTANT_REFRESH_INTERVAL" Default="60" Mode="" Description="Seconds between scans for new or changed Home Assistant entities." Type="Variable" Display="advanced" Required="false" Mask="false">60</Config>
-  <Config Name="Log Level" Target="HAMH_LOG_LEVEL" Default="info|debug|notice|warn|error|silly" Mode="" Description="Application log level." Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
+  <Config Name="Log Level" Target="HAMH_LOG_LEVEL" Default="info|debug|notice|warn|error|fatal|silly" Mode="" Description="Application log level." Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
   <Config Name="Node Options" Target="NODE_OPTIONS" Default="" Mode="" Description="Optional Node.js flags, e.g. --max-old-space-size=768 to cap memory on small systems." Type="Variable" Display="advanced" Required="false" Mask="false"/>
 </Container>
