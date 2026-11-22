@@ -15,7 +15,7 @@
 **Requirements**
 
 - The **Nvidia Driver** plugin. Pick your GPU with NVIDIA_VISIBLE_DEVICES (all, or a GPU UUID from the plugin page).
-- GTX 900-series through RTX 40-series: use the default `:latest` tag. **RTX 50-series (Blackwell):** change the repository to `ghcr.io/remsky/kokoro-fastapi-gpu:latest-cu128`. Upstream recommends pinning a release tag (e.g. `:v0.4.x`) for stable use. No NVIDIA GPU: use `ghcr.io/remsky/kokoro-fastapi-cpu:latest` instead.
+- GTX 900-series through RTX 40-series: use the default `:latest` tag. **RTX 50-series (Blackwell):** change the repository to `ghcr.io/remsky/kokoro-fastapi-gpu:latest-cu128`. Upstream recommends pinning a release tag (e.g. `:v0.10.0`; RTX 50-series `:v0.10.0-cu128`) for stable use. No NVIDIA GPU: use `ghcr.io/remsky/kokoro-fastapi-cpu:latest` instead.
 
 **Home Assistant**
 
