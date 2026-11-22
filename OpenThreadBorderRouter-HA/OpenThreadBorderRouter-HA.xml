@@ -1,74 +1,79 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <Container version="2">
   <Name>OpenThreadBorderRouter-HA</Name>
   <Repository>ghcr.io/ownbee/hass-otbr-docker:latest</Repository>
-  <Registry>https://github.com/ownbee/hass-otbr-docker</Registry>
+  <Registry>https://github.com/ownbee/hass-otbr-docker/pkgs/container/hass-otbr-docker</Registry>
   <Network>host</Network>
   <MyIP/>
   <Shell>bash</Shell>
   <Privileged>true</Privileged>
   <Support>https://community.home-assistant.io/t/ha-docker-with-otbr-docker/735288</Support>
-  <Project>https://openthread.io/guides/border-router</Project>
-  <Overview>
-    [b][u]OpenThread Border Router (Home Assistant Optimized)[/u][/b]&#13;
-    &#13;
-    This container runs an OpenThread Border Router (OTBR) specifically tweaked for integration with Home Assistant via the Silicon Labs EFR32MG21 chipset (SkyConnect, ZBT-1, Sonoff ZBDongle-E).&#13;
-    &#13;
-    [b][span style='color: #E80000;']CRITICAL PREREQUISITES - READ BEFORE INSTALLING:[/span][/b]&#13;
-    &#13;
-    [b]1. Enable IPv6 in Unraid:[/b]&#13;
-    Navigate to [b]Settings &gt; Network Settings[/b]. Ensure "Network Protocol" is set to [b]IPv4 + IPv6[/b]. If this is disabled, Thread networking will not function.&#13;
-    &#13;
-    [b]2. Host Kernel Configuration (Persistence Required):[/b]&#13;
-    Unraid resets network forwarding rules on every reboot. You must apply the following commands on the Unraid Host to prevent the Thread network from breaking.&#13;
-    &#13;
-    [b]Commands to run:[/b]&#13;
-    [code]&#13;
-    sysctl -w net.ipv6.conf.all.forwarding=1&#13;
-    sysctl -w net.ipv6.conf.br0.accept_ra=2&#13;
-    sysctl -w net.ipv6.conf.eth0.accept_ra=2&#13;
-    [/code]&#13;
-    &#13;
-    [b]How to automate this (Choose one):[/b]&#13;
-    [u]Option A: User Scripts Plugin (Recommended)[/u]&#13;
-    Install the "User Scripts" plugin. Create a new script with the commands above and set it to run [b]"At Startup of Array"[/b].&#13;
-    &#13;
-    [u]Option B: The Go File (Native)[/u]&#13;
-    Edit the file [i]/boot/config/go[/i] on your flash drive and add the commands to the bottom of the file. This will execute them during the boot sequence.&#13;
-    &#13;
-    [b]3. USB Firmware:[/b] Your USB stick MUST be flashed with [b]OpenThread RCP Firmware[/b] at 460800 baud. (Multiprotocol firmware is not supported).&#13;
-    &#13;
-    [b]Configuration Notes:[/b]&#13;
-    - [b]Network Type:[/b] Must be [b]Host[/b] for mDNS discovery.&#13;
-    - [b]WebUI Port:[/b] Default is 8099 (to avoid conflict with Unraid Port 80).
-  </Overview>
-  <Category>HomeAutomation: Tools:Utilities</Category>
-  <WebUI>http://[IP]:[PORT:8099]/</WebUI>
-  <Icon>https://github.com/ds-sebastian/unraid-templates/blob/main/icons/otbr-icon.png?raw=true</Icon>
-  <ExtraParams>--cap-add=SYS_ADMIN --cap-add=NET_ADMIN --sysctl "net.ipv6.conf.all.disable_ipv6=0" --sysctl "net.ipv4.conf.all.forwarding=1" --sysctl "net.ipv6.conf.all.forwarding=1"</ExtraParams>
-  <PostArgs/>
+  <Project>https://github.com/ownbee/hass-otbr-docker</Project>
+  <ReadMe>https://github.com/ownbee/hass-otbr-docker#readme</ReadMe>
+  <Overview>Stand-alone build of the Home Assistant OpenThread Border Router add-on by ownbee (https://github.com/ownbee/hass-otbr-docker). It keeps the Home Assistant team's OTBR patches, settings migration and optional automatic firmware flashing for Home Assistant Connect ZBT-1/SkyConnect, without needing Home Assistant OS. Use the OpenThread-Border-Router template from this repository instead if you prefer the plain upstream image. Run only one border router per radio.
+
+**1. Radio firmware**
+
+The USB stick must run OpenThread **RCP** firmware (multiprotocol is not supported). Flash it with https://toolbox.openhomefoundation.org/, or set Auto-Flash Firmware to 1 to let the container install the Home Assistant RCP firmware on a ZBT-1/SkyConnect. Baud rate and flow control must match the firmware (460800 with flow control for Home Assistant firmware).
+
+**2. Unraid network settings**
+
+Settings &gt; Network Settings: Network protocol **IPv4 + IPv6**. The container needs **host** networking and privileged mode (upstream: do not change these). Set Backbone Interface to the interface that carries your LAN (br0, eth0 or bond0).
+
+**3. Host kernel settings (required)**
+
+Docker cannot set network sysctls for host-network containers, so set them on the Unraid host (replace br0 with your interface):
+
+`sysctl -w net.ipv4.ip_forward=1`
+`sysctl -w net.ipv6.conf.all.forwarding=1`
+`sysctl -w net.ipv6.conf.br0.accept_ra=2`
+`sysctl -w net.ipv6.conf.br0.accept_ra_rt_info_max_plen=64`
+
+Unraid resets these at reboot and when DHCP renews the interface, so put them in a User Scripts script that runs **At Startup of Array** and on a schedule such as `*/5 * * * *`. accept_ra=2 keeps Unraid's own IPv6 address while forwarding is on. The container log warns when IPv6 forwarding is off.
+
+**4. Home Assistant**
+
+Add the **OpenThread Border Router** integration with URL `http://YOUR-SERVER-IP:8081`, then open the **Thread** integration, make this network preferred, and on Android use the Home Assistant app's Settings &gt; Companion app &gt; Troubleshooting &gt; Sync Thread credentials. Then add Matter devices through the Matter integration.
+
+**Security:** the REST API and web UI have no authentication. Keep them on your LAN, or set Web UI Interface to 127.0.0.1 to hide the web UI. Back up the Data folder: it holds your Thread network credentials.
+
+Docs: https://github.com/ownbee/hass-otbr-docker#readme · Home Assistant: https://www.home-assistant.io/integrations/otbr/</Overview>
+  <Category>HomeAutomation: Network:Other</Category>
+  <ExtraSearchTerms>thread otbr matter border router openthread home assistant skyconnect zbt-1 rcp ipv6</ExtraSearchTerms>
+  <WebUI>http://[IP]:7586/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/OpenThreadBorderRouter-HA/OpenThreadBorderRouter-HA.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/otbr-icon.png</Icon>
+  <ExtraParams>--cap-add=NET_ADMIN --cap-add=SYS_ADMIN --stop-timeout=30</ExtraParams>
+  <PostArgs></PostArgs>
   <CPUset/>
-  <DateInstalled/>
   <DonateText/>
   <DonateLink/>
-  <Requires/>
-  
-  <Config Name="Radio Device (Passthrough)" Target="/dev/ttyUSB0" Default="/dev/serial/by-id/YOUR_DEVICE_HERE" Mode="rw" Description="Map your physical USB stick here (use /dev/serial/by-id/...). It maps to /dev/ttyUSB0 inside the container." Type="Device" Display="always" Required="true" Mask="false"/>
-  <Config Name="Radio Path (Internal)" Target="DEVICE" Default="/dev/ttyUSB0" Mode="" Description="The internal path to the radio. Leave this as /dev/ttyUSB0 matching the internal side of the device mapping above." Type="Variable" Display="advanced" Required="true" Mask="false">/dev/ttyUSB0</Config>
-  <Config Name="Baudrate" Target="BAUDRATE" Default="460800" Mode="" Description="Baudrate for RCP Firmware. SkyConnect/ZBT-1/Sonoff-E usually use 460800." Type="Variable" Display="always" Required="true" Mask="false">460800</Config>
-  <Config Name="Flow Control" Target="FLOW_CONTROL" Default="1" Mode="" Description="Hardware Flow Control. Set to 1 for SkyConnect/ZBT-1. Set to 0 if using a generic stick without flow control support." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
-  
-  <Config Name="Backbone Interface" Target="BACKBONE_IF" Default="br0" Mode="" Description="The Unraid Host interface connected to your LAN/Internet. Usually br0 or eth0." Type="Variable" Display="always" Required="true" Mask="false">br0</Config>
-  <Config Name="OTBR WebUI Port" Target="OTBR_WEB_PORT" Default="8099" Mode="" Description="Port for the OTBR Web Interface. Changed from default 80 to prevent conflict with Unraid." Type="Variable" Display="always" Required="true" Mask="false">8099</Config>
-  <Config Name="OTBR REST Port" Target="OTBR_REST_PORT" Default="8081" Mode="" Description="Port for the REST API (Used by Home Assistant)." Type="Variable" Display="advanced" Required="true" Mask="false">8081</Config>
-  <Config Name="Enable NAT64" Target="NAT64" Default="1" Mode="" Description="Enable NAT64 translation." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
-  <Config Name="Enable Firewall" Target="FIREWALL" Default="1" Mode="" Description="Enable internal firewall." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
-  
-  <Config Name="Data Storage" Target="/data/thread" Default="/mnt/user/appdata/otbr" Mode="rw" Description="Persistent storage for Thread credentials and dataset." Type="Path" Display="always" Required="true" Mask="false"/>
-  
-  <Config Name="TUN Adapter" Target="/dev/net/tun" Default="/dev/net/tun" Mode="rw" Description="Required for creating the wpan0 network interface." Type="Device" Display="advanced" Required="true" Mask="false">/dev/net/tun</Config>
-  <Config Name="Local Time" Target="/etc/localtime" Default="/etc/localtime" Mode="ro" Description="Sync time with host." Type="Path" Display="advanced" Required="false" Mask="false">/etc/localtime</Config>
-  
-  <Config Name="Auto-Flash Firmware" Target="AUTOFLASH_FIRMWARE" Default="0" Mode="" Description="Disable automatic firmware flashing attempts." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
-  <Config Name="Log Level" Target="OTBR_LOG_LEVEL" Default="info" Mode="" Description="Log verbosity (info, debug, warn)." Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
+  <Requires>A Thread USB radio with OpenThread RCP firmware
+Unraid IPv6 enabled and the host sysctls from the Overview applied</Requires>
+  <Changes>
+### 2026-11-22
+- Removed --sysctl flags: Docker refuses network sysctls with host networking, so the container could not start. Host settings are documented in the Overview instead
+- Added OTBR_WEB (the web UI never started without it), web UI interface, network radio and Thread beta options
+- Fixed log level values, default web UI port 7586 (8099 clashes with other apps), links and icon URL
+
+### 2025-12-15
+- Initial release
+  </Changes>
+  <Config Name="Radio (USB device)" Target="/dev/ttyUSB0" Default="/dev/serial/by-id/YOUR-RADIO-if00-port0:/dev/ttyUSB0" Mode="" Description="Host path of your RCP radio, followed by :/dev/ttyUSB0. Find it with ls -l /dev/serial/by-id/." Type="Device" Display="always" Required="true" Mask="false">/dev/serial/by-id/YOUR-RADIO-if00-port0:/dev/ttyUSB0</Config>
+  <Config Name="TUN Device" Target="/dev/net/tun" Default="/dev/net/tun" Mode="" Description="Required to create the wpan0 Thread interface." Type="Device" Display="advanced" Required="true" Mask="false">/dev/net/tun</Config>
+  <Config Name="Data" Target="/data/thread" Default="/mnt/user/appdata/otbr" Mode="rw" Description="Thread network credentials and settings (keep a backup)." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/otbr</Config>
+  <Config Name="Radio Path (container)" Target="DEVICE" Default="/dev/ttyUSB0" Mode="" Description="Radio path inside the container. Keep /dev/ttyUSB0 to match the device mapping above." Type="Variable" Display="advanced" Required="true" Mask="false">/dev/ttyUSB0</Config>
+  <Config Name="Baud Rate" Target="BAUDRATE" Default="460800" Mode="" Description="Serial speed of the RCP firmware. Home Assistant ZBT-1/SkyConnect/ZBT-2 firmware: 460800." Type="Variable" Display="always" Required="true" Mask="false">460800</Config>
+  <Config Name="Flow Control" Target="FLOW_CONTROL" Default="1|0" Mode="" Description="1 = hardware flow control (Home Assistant firmware). 0 for radios without it." Type="Variable" Display="always" Required="true" Mask="false">1</Config>
+  <Config Name="Backbone Interface" Target="BACKBONE_IF" Default="br0" Mode="" Description="Host LAN interface Thread is routed to (br0, eth0, bond0 or a VLAN like br0.3)." Type="Variable" Display="always" Required="true" Mask="false">br0</Config>
+  <Config Name="Web UI" Target="OTBR_WEB" Default="1|0" Mode="" Description="1 starts the OTBR web UI. The image only starts it when this variable is set." Type="Variable" Display="always" Required="false" Mask="false">1</Config>
+  <Config Name="Web UI Port" Target="OTBR_WEB_PORT" Default="7586" Mode="" Description="OTBR web UI port. Avoid 80 (Unraid) and 8080. If you change it, update the WebUI link in Advanced View too." Type="Variable" Display="always" Required="false" Mask="false">7586</Config>
+  <Config Name="Web UI Interface" Target="OTBR_WEB_INTERFACE" Default="" Mode="" Description="Address the web UI listens on, e.g. 127.0.0.1 for local only. Empty = all addresses." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="REST API Port" Target="OTBR_REST_PORT" Default="8081" Mode="" Description="REST API used by the Home Assistant integration (http://YOUR-SERVER-IP:8081)." Type="Variable" Display="always" Required="false" Mask="false">8081</Config>
+  <Config Name="NAT64" Target="NAT64" Default="1|0" Mode="" Description="1 lets Thread devices reach IPv4-only hosts (cloud services, NTP)." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Firewall" Target="FIREWALL" Default="1|0" Mode="" Description="1 blocks unsolicited inbound traffic to Thread devices (recommended)." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Auto-Flash Firmware" Target="AUTOFLASH_FIRMWARE" Default="0|1" Mode="" Description="1 installs or updates Home Assistant's OpenThread RCP firmware on ZBT-1/SkyConnect at start. Leave 0 for other radios." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Network Radio" Target="NETWORK_DEVICE" Default="" Mode="" Description="Optional IP:port of a network-attached RCP (for example a serial-over-TCP adapter). Also set Radio Path to /tmp/ttyOTBR. Untested upstream." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Thread Beta" Target="THREAD_BETA" Default="" Mode="" Description="Set to 1 to run the beta OTBR build (Thread 1.4+). Empty = stable." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Log Level" Target="OTBR_LOG_LEVEL" Default="info|notice|warning|error|debug" Mode="" Description="otbr-agent log level." Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
 </Container>

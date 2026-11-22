@@ -4,33 +4,67 @@
   <Repository>ghcr.io/ds-sebastian/pricecious:latest</Repository>
   <Registry>https://github.com/ds-sebastian/pricecious/pkgs/container/pricecious</Registry>
   <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
   <Privileged>false</Privileged>
   <Support>https://github.com/ds-sebastian/pricecious/issues</Support>
   <Project>https://github.com/ds-sebastian/pricecious</Project>
-  <Overview>Pricecious is a vibe-coded, self-hosted, AI-powered price tracking application. It uses GenAI Vision Models (OpenAI, Anthropic, Ollama, etc.) to visually analyze product pages, detect prices, and monitor stock status.&#xD;
-&#xD;
-Features:&#xD;
-- AI-Powered Analysis: "Sees" price and stock status, bypassing complex HTML.&#xD;
-- Visual History: Keeps a screenshot history of every check.&#xD;
-- Smart Scrolling: Handles lazy-loaded content.&#xD;
-- Notifications: Supports Discord, Telegram, Email, etc. via Apprise.&#xD;
-&#xD;
-**Prerequisites:**&#xD;
-1. A PostgreSQL Database.&#xD;
-2. A Browserless (headless chrome) container (accessible via WebSocket).&#xD;
-3. An API key for an AI Provider (OpenAI/Anthropic) OR a local Ollama instance.</Overview>
+  <ReadMe>https://github.com/ds-sebastian/pricecious/blob/main/README.md</ReadMe>
+  <Overview>Pricecious is a self-hosted, AI-powered price tracker. It opens each product page in a headless browser (Browserless), takes a screenshot and asks a vision model (Ollama, OpenAI, Anthropic, Gemini or OpenRouter) for the price and stock status, so it keeps working on pages where CSS selectors break.
+
+**Features**
+
+- Price and stock history with a screenshot of every check
+- Lowest-price and sale badges, target prices and a "Deals" filter
+- Tag-based compare charts and optional Prophet price forecasts
+- Bookmarklet to add the product page you are looking at
+- Notifications through Apprise (Discord, Telegram, ntfy, email, Pushover and many more) when prices drop, hit your target or items come back in stock
+
+**Before you install**
+
+1. A PostgreSQL database (any recent version, e.g. the official postgres container). Create an empty database such as `pricewatch`.
+2. A Browserless container, e.g. `ghcr.io/browserless/chromium` (or the older `browserless/chrome`), reachable from this container on port 3000.
+3. A vision model: a local Ollama model, or an API key for a hosted provider.
+
+**Setup**
+
+1. Fill in the Database URL and Browserless URL below and start the container. Database migrations run automatically on start.
+2. Open the WebUI, go to **Settings** and pick your AI provider, model and API key. AI, scraper, schedule and notification settings live in the Settings page, not in environment variables.
+3. Add products on the **Items** page.
+
+**Security:** Pricecious has no user authentication. Anyone who can reach it can change settings and trigger AI-backed checks. Keep it on your LAN or VPN, or put it behind a reverse proxy with authentication, and never port-forward it to the internet. Ideally run Browserless behind an egress firewall that blocks private addresses.</Overview>
   <Category>Tools:Utilities AI:</Category>
-  <WebUI>http://[IP]:[PORT:8000]</WebUI>
-  <TemplateURL>https://github.com/ds-sebastian/unraid-templates/blob/main/pricecious/pricecious.xml</TemplateURL>
-  <Icon>https://github.com/ds-sebastian/pricecious/blob/main/frontend/public/apple-touch-icon.png?raw=true</Icon>
-  <ExtraParams/>
+  <WebUI>http://[IP]:[PORT:8000]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/pricecious/pricecious.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/pricecious.png</Icon>
+  <ExtraParams>--add-host=host.docker.internal:host-gateway</ExtraParams>
   <PostArgs/>
-  <Requires>PostgreSQL Database&#xD;
-Browserless (Chrome) instance</Requires>
-  <Config Name="WebUI Port" Target="8000" Default="8000" Mode="tcp" Description="Container Port: 8000" Type="Port" Display="always" Required="true" Mask="false">8000</Config>
-  <Config Name="Database URL" Target="DATABASE_URL" Default="" Mode="" Description="Format: postgresql://user:password@host:5432/pricewatch" Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="Browserless URL" Target="BROWSERLESS_URL" Default="" Mode="" Description="WebSocket URL for the Browserless instance (e.g., ws://192.168.1.10:3000)" Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="Screenshots Path" Target="/app/screenshots" Default="/mnt/user/appdata/pricecious/screenshots" Mode="rw" Description="Persistent storage for captured screenshots." Type="Path" Display="always" Required="false" Mask="false"/>
-  <Config Name="Log Level" Target="LOG_LEVEL" Default="INFO" Mode="" Description="Application logging level (DEBUG, INFO, WARN, ERROR)." Type="Variable" Display="advanced" Required="false" Mask="false">INFO</Config>
-  <Config Name="SQL Echo" Target="SQL_ECHO" Default="false" Mode="" Description="Log all SQL queries to console (true/false)." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>PostgreSQL database
+Browserless (headless Chrome) container
+A vision model: local Ollama, or an API key for OpenAI, Anthropic, Gemini or OpenRouter</Requires>
+  <Changes>
+### 2026-11-22
+- Added the Browserless token, stealth, ad-blocking, headless and viewport options, and CORS origins
+- Documented that AI, scraper and schedule settings are configured in the WebUI
+- Added host.docker.internal so a local Ollama on the host is reachable
+- Fixed the template and icon URLs
+### 2025-11-21
+- Initial release
+  </Changes>
+  <Config Name="WebUI Port" Target="8000" Default="8000" Mode="tcp" Description="Port for the Pricecious web interface and API." Type="Port" Display="always" Required="true" Mask="false">8000</Config>
+  <Config Name="Screenshots" Target="/app/screenshots" Default="/mnt/user/appdata/pricecious/screenshots" Mode="rw" Description="Screenshot history for every price check." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/pricecious/screenshots</Config>
+  <Config Name="Database URL" Target="DATABASE_URL" Default="" Mode="" Description="Required. PostgreSQL connection string, e.g. postgresql://pricecious:PASSWORD@192.168.1.10:5432/pricewatch" Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="Browserless URL" Target="BROWSERLESS_URL" Default="ws://192.168.1.10:3000" Mode="" Description="Required. WebSocket URL of your Browserless container, or of any Chrome with remote debugging enabled. Replace the example IP with your server's IP." Type="Variable" Display="always" Required="true" Mask="false">ws://192.168.1.10:3000</Config>
+  <Config Name="Browserless Token" Target="BROWSERLESS_TOKEN" Default="" Mode="" Description="The TOKEN set on your Browserless container, if any." Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Browserless Stealth Mode" Target="BROWSERLESS_STEALTH" Default="false|true" Mode="" Description="Ask Browserless to use stealth mode, which helps on sites that block headless browsers." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Browserless Block Ads" Target="BROWSERLESS_BLOCK_ADS" Default="false|true" Mode="" Description="Ask Browserless to block ads while loading pages." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Browserless Headless Mode" Target="BROWSERLESS_HEADLESS" Default="" Mode="" Description="Headless mode passed to Browserless, e.g. new, true or false. Leave empty for the Browserless default." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Viewport Width" Target="BROWSERLESS_VIEWPORT_WIDTH" Default="" Mode="" Description="Browser viewport width in pixels, e.g. 1920. Leave empty for the default." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Viewport Height" Target="BROWSERLESS_VIEWPORT_HEIGHT" Default="" Mode="" Description="Browser viewport height in pixels, e.g. 1080. Leave empty for the default." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="CORS Origins" Target="CORS_ORIGINS" Default="" Mode="" Description="Extra trusted browser origins, comma separated, e.g. https://pricecious.example.com. Same-origin requests need no entry." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Log Level" Target="LOG_LEVEL" Default="INFO|DEBUG|WARNING|ERROR" Mode="" Description="Application log level." Type="Variable" Display="advanced" Required="false" Mask="false">INFO</Config>
+  <Config Name="SQL Echo" Target="SQL_ECHO" Default="false|true" Mode="" Description="Log every SQL query (debugging only)." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
 </Container>

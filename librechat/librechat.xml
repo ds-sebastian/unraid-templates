@@ -2,48 +2,109 @@
 <Container version="2">
   <Name>LibreChat</Name>
   <Repository>ghcr.io/danny-avila/librechat:latest</Repository>
-  <Registry>https://github.com/danny-avila/LibreChat</Registry>
+  <Registry>https://github.com/users/danny-avila/packages/container/package/librechat</Registry>
   <Network>bridge</Network>
   <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
   <Support>https://forums.unraid.net/topic/151417-support-pureelectricity-librechat/</Support>
-  <Project>https://github.com/danny-avila/LibreChat</Project>
-  <Overview>LibreChat: Enhanced ChatGPT Clone. Features: Agents, Anthropic, AWS, OpenAI, Azure, Gemini, AI model switching, message search, langchain, DALL-E-3, Multi-User Auth, and more.&#xD;
-&#xD;
-[b]PREREQUISITES:[/b]&#xD;
-1. You must have a MongoDB container running (e.g., the official mongo docker).&#xD;
-2. You must generate random hex strings for the CREDS_KEY, CREDS_IV, and JWT_SECRET below, or logins will fail.&#xD;
-&#xD;
-[b]CONFIGURATION:[/b]&#xD;
-- This template uses Environment Variables for config. &#xD;
-- The 'librechat.yaml' file is optional and not mapped by default to prevent boot errors. If you need advanced configuration (custom endpoints), create the file on your server first, then add a Host Path mapping manually: /mnt/user/appdata/librechat/librechat.yaml -> /app/librechat.yaml</Overview>
-  <Category>Tools: Productivity:</Category>
+  <Project>https://www.librechat.ai</Project>
+  <ReadMe>https://www.librechat.ai/docs/configuration/dotenv</ReadMe>
+  <Overview>LibreChat is an open-source, self-hosted ChatGPT-style interface for many AI providers: OpenAI, Anthropic, Google, Azure, AWS Bedrock, OpenRouter, Ollama and any OpenAI-compatible API. It supports agents, MCP servers, artifacts, code interpreter, file chat (RAG), web search, presets, conversation search, and multi-user login (email, OpenID/OAuth, LDAP).
+
+**Before you install**
+
+1. Run a MongoDB container (e.g. the official mongo image) and note its address. MongoDB 5+ needs a CPU with AVX; on older CPUs use mongo:4.4.18.
+2. Generate the four secrets below at https://www.librechat.ai/toolkit/creds_generator or with `openssl rand -hex 32` (CREDS_KEY, JWT secrets) and `openssl rand -hex 16` (CREDS_IV). Logins fail without them, and changing CREDS_KEY/CREDS_IV later makes saved user API keys unreadable.
+
+**Setup**
+
+1. Set Client Domain and Server Domain to the exact URL you open LibreChat on (e.g. `http://192.168.1.10:3080` or `https://chat.example.com`).
+2. Start the container and register. The first account is the admin. Then set Allow Registration to false if this is a private instance.
+3. Provider keys set to `user_provided` let each user enter their own key in the UI. Put a real key in to share one key with everyone.
+
+**Optional extras**
+
+- Conversation search: run a Meilisearch container (getmeili/meilisearch), set Search to true and fill in its host and master key.
+- File chat (RAG): run the LibreChat RAG API (registry.librechat.ai/librechat-ai/librechat-rag-api-dev-lite) with a pgvector database and set RAG API URL.
+- Custom endpoints, MCP servers, model lists and interface settings live in `librechat.yaml`. Create the file in your appdata folder first (for example `/mnt/user/appdata/librechat/data/librechat.yaml`), then set Config Path to `/app/data/librechat.yaml`. Mapping a file that does not exist yet makes Docker create a folder and the app fails to start.
+- Every other setting from the upstream .env file can be added with "Add another Path, Port, Variable".
+
+`host.docker.internal` points to your Unraid server (as in the upstream compose file), so a local Ollama can be reached at `http://host.docker.internal:11434`. Docs: https://www.librechat.ai/docs</Overview>
+  <Category>AI: Productivity: Tools:Utilities</Category>
   <WebUI>http://[IP]:[PORT:3080]/</WebUI>
-  <TemplateURL/>
-  <Icon>https://raw.githubusercontent.com/danny-avila/LibreChat/main/client/public/assets/logo.png</Icon>
-  <ExtraParams/>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/librechat/librechat.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/LibreChat.png</Icon>
+  <ExtraParams>--add-host=host.docker.internal:host-gateway</ExtraParams>
   <PostArgs/>
   <CPUset/>
-  <DateInstalled/>
   <DonateText/>
   <DonateLink/>
-  <Requires/>
-  <Config Name="WebUI Port" Target="3080" Default="3080" Mode="tcp" Description="The port to access the LibreChat interface." Type="Port" Display="always" Required="true" Mask="false"/>
-  <Config Name="Host Binding" Target="HOST" Default="0.0.0.0" Mode="" Description="Required for Docker networking." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="Client Domain" Target="DOMAIN_CLIENT" Default="http://[IP]:[PORT:3080]" Mode="" Description="The URL used to access the app. MUST include http:// or https://. " Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="Server Domain" Target="DOMAIN_SERVER" Default="http://[IP]:[PORT:3080]" Mode="" Description="Usually the same as Client Domain." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="MongoDB URI" Target="MONGO_URI" Default="" Mode="" Description="Required. Format: mongodb://[IP]:27017/LibreChat" Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="Crypto Key" Target="CREDS_KEY" Default="" Mode="" Description="Required. 64-character hex string. Run 'openssl rand -hex 32' to generate." Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="Crypto IV" Target="CREDS_IV" Default="" Mode="" Description="Required. 32-character hex string. Run 'openssl rand -hex 16' to generate." Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="JWT Secret" Target="JWT_SECRET" Default="" Mode="" Description="Required. Long random string for signing tokens." Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="JWT Refresh Secret" Target="JWT_REFRESH_SECRET" Default="" Mode="" Description="Required. Long random string for refresh tokens." Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="OpenAI API Key" Target="OPENAI_API_KEY" Default="user_provided" Mode="" Description="Optional. If set to 'user_provided', users can enter their own key in the UI." Type="Variable" Display="always" Required="false" Mask="true"/>
-  <Config Name="Image Storage" Target="/app/client/public/images" Default="/mnt/user/appdata/librechat/images" Mode="rw" Description="Persist uploaded images and avatars." Type="Path" Display="always" Required="true" Mask="false"/>
-  <Config Name="Logs" Target="/app/logs" Default="/mnt/user/appdata/librechat/logs" Mode="rw" Description="Container logs." Type="Path" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="Install MeiliSearch" Target="SEARCH" Default="false" Mode="" Description="Set to 'true' only if you have a separate MeiliSearch container running for chat history search." Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="MeiliSearch Host" Target="MEILI_HOST" Default="" Mode="" Description="http://[IP]:7700" Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="MeiliSearch Key" Target="MEILI_MASTER_KEY" Default="" Mode="" Description="The master key from your MeiliSearch container." Type="Variable" Display="advanced" Required="false" Mask="true"/>
-  <Config Name="UID" Target="UID" Default="99" Mode="" Description="Unraid Default User ID" Type="Variable" Display="advanced" Required="false" Mask="false"/>
-  <Config Name="GID" Target="GID" Default="100" Mode="" Description="Unraid Default Group ID" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Requires>MongoDB container
+Optional: Meilisearch (conversation search), LibreChat RAG API + pgvector (file chat)</Requires>
+  <Changes>
+### 2026-11-22
+- Fixed the broken icon and the missing template URL
+- Added the uploads, data and skills folders that current releases use
+- Removed the UID/GID variables, which the image never read
+- Added host.docker.internal like the upstream compose file
+- Added Anthropic, Google, OpenRouter and Assistants keys, registration/login switches, OpenID SSO, SMTP email, RAG API, librechat.yaml path, proxy trust and logging options
+### 2025-12-17
+- Revised configuration details
+### 2024-01-17
+- Initial release
+  </Changes>
+  <Config Name="WebUI Port" Target="3080" Default="3080" Mode="tcp" Description="LibreChat web interface." Type="Port" Display="always" Required="true" Mask="false">3080</Config>
+  <Config Name="Images" Target="/app/client/public/images" Default="/mnt/user/appdata/librechat/images" Mode="rw" Description="Generated images and avatars." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/librechat/images</Config>
+  <Config Name="Uploads" Target="/app/uploads" Default="/mnt/user/appdata/librechat/uploads" Mode="rw" Description="Files users upload to chats and agents." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/librechat/uploads</Config>
+  <Config Name="Data" Target="/app/data" Default="/mnt/user/appdata/librechat/data" Mode="rw" Description="App data and temporary credentials. A good place for librechat.yaml (see Config Path)." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/librechat/data</Config>
+  <Config Name="Logs" Target="/app/logs" Default="/mnt/user/appdata/librechat/logs" Mode="rw" Description="Error and debug log files." Type="Path" Display="advanced" Required="false" Mask="false">/mnt/user/appdata/librechat/logs</Config>
+  <Config Name="Skills" Target="/app/skill" Default="/mnt/user/appdata/librechat/skill" Mode="rw" Description="Agent skills folder (mounted the same way in the upstream docker-compose.yml)." Type="Path" Display="advanced" Required="false" Mask="false">/mnt/user/appdata/librechat/skill</Config>
+  <Config Name="Host Binding" Target="HOST" Default="0.0.0.0" Mode="" Description="Listen address. Keep 0.0.0.0 in Docker." Type="Variable" Display="advanced" Required="true" Mask="false">0.0.0.0</Config>
+  <Config Name="Client Domain" Target="DOMAIN_CLIENT" Default="http://192.168.1.10:3080" Mode="" Description="Required. The full URL you open LibreChat on, including http:// or https://. Replace the example IP." Type="Variable" Display="always" Required="true" Mask="false">http://192.168.1.10:3080</Config>
+  <Config Name="Server Domain" Target="DOMAIN_SERVER" Default="http://192.168.1.10:3080" Mode="" Description="Required. Usually the same as Client Domain." Type="Variable" Display="always" Required="true" Mask="false">http://192.168.1.10:3080</Config>
+  <Config Name="MongoDB URI" Target="MONGO_URI" Default="mongodb://192.168.1.10:27017/LibreChat" Mode="" Description="Required. MongoDB connection string, e.g. mongodb://192.168.1.10:27017/LibreChat (add user:password@ if auth is enabled)." Type="Variable" Display="always" Required="true" Mask="true">mongodb://192.168.1.10:27017/LibreChat</Config>
+  <Config Name="Credentials Key" Target="CREDS_KEY" Default="" Mode="" Description="Required. 64 hex characters (openssl rand -hex 32). Encrypts stored user API keys; do not change later." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="Credentials IV" Target="CREDS_IV" Default="" Mode="" Description="Required. 32 hex characters (openssl rand -hex 16)." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="JWT Secret" Target="JWT_SECRET" Default="" Mode="" Description="Required. 64 hex characters (openssl rand -hex 32)." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="JWT Refresh Secret" Target="JWT_REFRESH_SECRET" Default="" Mode="" Description="Required. 64 hex characters (openssl rand -hex 32), different from JWT Secret." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="Allow Registration" Target="ALLOW_REGISTRATION" Default="true|false" Mode="" Description="Allow new users to sign up. Register your admin account, then set this to false for a private instance." Type="Variable" Display="always" Required="false" Mask="false">true</Config>
+  <Config Name="Allow Email Login" Target="ALLOW_EMAIL_LOGIN" Default="true|false" Mode="" Description="Allow email and password login. Set to false when you only use SSO." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Allow Social Login" Target="ALLOW_SOCIAL_LOGIN" Default="false|true" Mode="" Description="Enable OpenID/OAuth login buttons." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Allow Social Registration" Target="ALLOW_SOCIAL_REGISTRATION" Default="false|true" Mode="" Description="Create accounts automatically on first OpenID/OAuth login." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Allow Password Reset" Target="ALLOW_PASSWORD_RESET" Default="false|true" Mode="" Description="Enable password reset. Needs the email settings below." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Allow Unverified Email Login" Target="ALLOW_UNVERIFIED_EMAIL_LOGIN" Default="true|false" Mode="" Description="Allow login before the email address is verified. Keep true unless email is configured." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="OpenAI API Key" Target="OPENAI_API_KEY" Default="user_provided" Mode="" Description="A shared key, user_provided (each user enters their own), or empty to hide the endpoint." Type="Variable" Display="always" Required="false" Mask="true">user_provided</Config>
+  <Config Name="Anthropic API Key" Target="ANTHROPIC_API_KEY" Default="user_provided" Mode="" Description="A shared key, user_provided, or empty to hide the endpoint." Type="Variable" Display="always" Required="false" Mask="true">user_provided</Config>
+  <Config Name="Google API Key" Target="GOOGLE_KEY" Default="user_provided" Mode="" Description="Gemini API key, user_provided, or empty to hide the endpoint." Type="Variable" Display="always" Required="false" Mask="true">user_provided</Config>
+  <Config Name="Assistants API Key" Target="ASSISTANTS_API_KEY" Default="" Mode="" Description="OpenAI Assistants endpoint key, user_provided, or empty to hide it." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="OpenRouter API Key" Target="OPENROUTER_KEY" Default="" Mode="" Description="Used by an OpenRouter custom endpoint in librechat.yaml." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Enabled Endpoints" Target="ENDPOINTS" Default="" Mode="" Description="Optional comma-separated list and order of endpoints, e.g. openAI,anthropic,google,agents,custom. Empty shows every configured endpoint." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Config Path" Target="CONFIG_PATH" Default="" Mode="" Description="Path or URL of librechat.yaml, e.g. /app/data/librechat.yaml after you create it in the Data folder. Empty uses /app/librechat.yaml (not present in the image)." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Search (Meilisearch)" Target="SEARCH" Default="false|true" Mode="" Description="Enable conversation search. Needs a Meilisearch container." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Meilisearch Host" Target="MEILI_HOST" Default="" Mode="" Description="e.g. http://192.168.1.10:7700" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Meilisearch Master Key" Target="MEILI_MASTER_KEY" Default="" Mode="" Description="The MEILI_MASTER_KEY of your Meilisearch container." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Meilisearch No Analytics" Target="MEILI_NO_ANALYTICS" Default="true|false" Mode="" Description="Disable Meilisearch telemetry." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="RAG API URL" Target="RAG_API_URL" Default="" Mode="" Description="URL of the LibreChat RAG API for file chat, e.g. http://192.168.1.10:8000" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="OpenID Issuer" Target="OPENID_ISSUER" Default="" Mode="" Description="SSO: issuer URL of your OpenID Connect provider (Authentik, Authelia, Kanidm, Keycloak...). Also set Allow Social Login to true." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="OpenID Client ID" Target="OPENID_CLIENT_ID" Default="" Mode="" Description="SSO client ID." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="OpenID Client Secret" Target="OPENID_CLIENT_SECRET" Default="" Mode="" Description="SSO client secret." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="OpenID Session Secret" Target="OPENID_SESSION_SECRET" Default="" Mode="" Description="Random string for the SSO session (openssl rand -hex 32)." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="OpenID Scope" Target="OPENID_SCOPE" Default="openid profile email" Mode="" Description="Scopes requested from the provider." Type="Variable" Display="advanced" Required="false" Mask="false">openid profile email</Config>
+  <Config Name="OpenID Callback URL" Target="OPENID_CALLBACK_URL" Default="/oauth/openid/callback" Mode="" Description="Callback path. Register DOMAIN_SERVER + this path as the redirect URI at your provider." Type="Variable" Display="advanced" Required="false" Mask="false">/oauth/openid/callback</Config>
+  <Config Name="OpenID Button Label" Target="OPENID_BUTTON_LABEL" Default="" Mode="" Description="Text on the SSO login button." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="OpenID Auto Redirect" Target="OPENID_AUTO_REDIRECT" Default="false|true" Mode="" Description="Skip the login page and go straight to the SSO provider." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Email Host" Target="EMAIL_HOST" Default="" Mode="" Description="SMTP server for password reset and verification emails." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Email Port" Target="EMAIL_PORT" Default="25" Mode="" Description="SMTP port, e.g. 587 or 465." Type="Variable" Display="advanced" Required="false" Mask="false">25</Config>
+  <Config Name="Email Encryption" Target="EMAIL_ENCRYPTION" Default="" Mode="" Description="Empty, starttls or tls." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Email Username" Target="EMAIL_USERNAME" Default="" Mode="" Description="SMTP username." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Email Password" Target="EMAIL_PASSWORD" Default="" Mode="" Description="SMTP password." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Email From" Target="EMAIL_FROM" Default="" Mode="" Description="Sender address, e.g. noreply@example.com" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Email From Name" Target="EMAIL_FROM_NAME" Default="LibreChat" Mode="" Description="Sender name." Type="Variable" Display="advanced" Required="false" Mask="false">LibreChat</Config>
+  <Config Name="Trust Proxy" Target="TRUST_PROXY" Default="1" Mode="" Description="Number of reverse proxies in front of LibreChat (for correct client IPs and rate limits)." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="No Index" Target="NO_INDEX" Default="true|false" Mode="" Description="Ask search engines not to index the site." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="App Title" Target="APP_TITLE" Default="LibreChat" Mode="" Description="Name shown in the browser tab and UI." Type="Variable" Display="advanced" Required="false" Mask="false">LibreChat</Config>
+  <Config Name="Debug Logging" Target="DEBUG_LOGGING" Default="false|true" Mode="" Description="Write debug log files to the Logs folder." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Console JSON" Target="CONSOLE_JSON" Default="false|true" Mode="" Description="Log to the console as JSON." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Temp Credentials Path" Target="LIBRECHAT_TEMP_CREDENTIALS_PATH" Default="/app/data/.env.temp" Mode="" Description="Where LibreChat keeps temporary credentials (same as the upstream compose file)." Type="Variable" Display="advanced" Required="false" Mask="false">/app/data/.env.temp</Config>
 </Container>

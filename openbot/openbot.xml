@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>openbot</Name>
+  <Repository>ghcr.io/nightly-labs/openbot:latest</Repository>
+  <Registry>https://github.com/nightly-labs/openbot/pkgs/container/openbot</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/nightly-labs/openbot/issues</Support>
+  <Project>https://openbot.run</Project>
+  <ReadMe>https://github.com/nightly-labs/openbot/blob/main/docs/docker.md</ReadMe>
+  <Overview>OpenBot runs your AI coding and computer-use agents (Claude Code, Codex, Gemini, OpenCode, Cursor, Grok and more) as an always-on self-hosted server. You use it from the OpenBot desktop app, the iPhone app or https://openbot.run/app with the same account. The container publishes no port: it only connects out (to openbot.run, your AI providers, and Signal/TURN relays for remote access).
+
+**Before the first start (required)**
+
+Run this in the Unraid terminal. It downloads the seccomp profile OpenBot needs for its Electron sandbox and gives the data folder to the image's user (uid 1000):
+
+`mkdir -p /mnt/user/appdata/openbot/data`
+`curl -fsSL -o /mnt/user/appdata/openbot/seccomp.json https://raw.githubusercontent.com/nightly-labs/openbot/main/docker/seccomp.json`
+`chown 1000:1000 /mnt/user/appdata/openbot/data`
+`chmod 700 /mnt/user/appdata/openbot/data`
+
+Without the profile the container stops with "cannot make a user namespace". If the folder is not owned by 1000 it stops with "User 1000 cannot write to /data". Do not use `seccomp=unconfined` or Privileged instead.
+
+**Sign in**
+
+1. Start the container, then run `docker exec -it openbot openbot login` (email and emailed code).
+2. Open the OpenBot app with the same account and connect a provider (Claude Code, Codex...).
+3. Phone: `docker exec -it openbot openbot mobile-connect` and scan the QR code (valid 2 minutes). `openbot status` shows the version, account and memory limits.
+
+**Notes**
+
+- Extra Parameters hold upstream's required options: seccomp profile, no-new-privileges, 1 GB shared memory (Chromium), a 60 s stop timeout (OpenBot closes its database cleanly) and `--restart=unless-stopped` (the app exits on purpose when you restart it from Server Settings).
+- Updates come from pulling a new image. Never roll back to an older tag: newer versions migrate the database. Re-check `docker/seccomp.json` after big updates.
+- Agents have full access inside the container. Do not map the Docker socket or shares the agents must not change. Install extra tools into `~/.local` (on PATH) so they survive updates.
+- Host network is optional (LAN clients connect directly instead of through TURN), but the container will not start if Unraid runs its own GUI display.
+- Self-hosted account server: add a variable `OPENBOT_AUTH_API_URL` (HTTPS). Do not add it empty, because OpenBot rejects an empty URL.
+- Licence: PolyForm Noncommercial 1.0.0.
+
+Docker guide: https://github.com/nightly-labs/openbot/blob/main/docs/docker.md</Overview>
+  <Category>AI: Productivity: Tools:Utilities</Category>
+  <ExtraSearchTerms>ai agents claude code codex gemini opencode computer use self-hosted server</ExtraSearchTerms>
+  <WebUI></WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/openbot/openbot.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/openbot.png</Icon>
+  <ExtraParams>--security-opt seccomp=/mnt/user/appdata/openbot/seccomp.json --security-opt no-new-privileges:true --shm-size=1g --stop-timeout=60 --restart=unless-stopped</ExtraParams>
+  <PostArgs></PostArgs>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>seccomp.json downloaded to /mnt/user/appdata/openbot/ and the data folder owned by 1000:1000 (see Overview)
+An openbot.run account</Requires>
+  <Changes>
+### 2026-11-22
+- Initial release
+  </Changes>
+  <Config Name="Data" Target="/data" Default="/mnt/user/appdata/openbot/data" Mode="rw" Description="Everything OpenBot keeps: database, conversations, agent workspaces, browser data, provider sign-ins and keyring. Must be owned by 1000:1000 (see Overview). Keep it as one unit and back it up with the container stopped." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openbot/data</Config>
+  <Config Name="Agent Display Size" Target="OPENBOT_DISPLAY_SIZE" Default="1280x800" Mode="" Description="Size of the virtual display agents use for computer use, WIDTHxHEIGHT from 640x480 to 2576x2576." Type="Variable" Display="advanced" Required="false" Mask="false">1280x800</Config>
+  <Config Name="xAI API Key" Target="XAI_API_KEY" Default="" Mode="" Description="Optional provider key for Grok. Agents can read every variable set here." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Cursor API Key" Target="CURSOR_API_KEY" Default="" Mode="" Description="Optional provider key for Cursor." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Cline API Key" Target="CLINE_API_KEY" Default="" Mode="" Description="Optional provider key for Cline." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Setup Page Port" Target="OPENBOT_SETUP_PAGE_PORT" Default="" Mode="" Description="Optional (1024-65535, e.g. 8080). Starts a browser setup page for signing in the server; you must also add a matching Port mapping. Anyone who reaches it can sign in a signed-out server, so only expose it behind a password-protected proxy." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+</Container>

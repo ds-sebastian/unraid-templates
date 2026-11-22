@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>kanidm</Name>
+  <Repository>kanidm/server:latest</Repository>
+  <Registry>https://hub.docker.com/r/kanidm/server</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/kanidm/kanidm/discussions</Support>
+  <Project>https://kanidm.com</Project>
+  <ReadMe>https://kanidm.github.io/kanidm/stable/</ReadMe>
+  <Overview>Kanidm is a modern, secure identity management server written in Rust. It provides OAuth2 / OpenID Connect single sign-on, passkeys (WebAuthn), TOTP, a read-only LDAPS gateway, RADIUS (separate container), SSH key distribution and Unix/PAM logins, all from one small service with its own web portal.
+
+**Before the first start**
+
+Kanidm only speaks HTTPS, even behind a reverse proxy, and will not start without a certificate.
+
+1. Set **Domain** and **Origin** below. They must match (`idm.example.com` with `https://idm.example.com`). The domain is baked into passkeys and OAuth2 and is hard to change later; read https://kanidm.github.io/kanidm/stable/choosing_a_domain_name.html first.
+2. Certificate, pick one:
+   - Your own: put `chain.pem` (full chain) and `key.pem` in `/mnt/user/appdata/kanidm`, for example a wildcard Let's Encrypt certificate copied from your reverse proxy.
+   - Self-signed (fine behind a reverse proxy). Run this once in the Unraid terminal, using your own domain and origin:
+
+`docker run --rm -v /mnt/user/appdata/kanidm:/data -e KANIDM_DOMAIN=idm.example.com -e KANIDM_ORIGIN=https://idm.example.com -e KANIDM_TLS_CHAIN=/data/chain.pem -e KANIDM_TLS_KEY=/data/key.pem -e KANIDM_DB_PATH=/data/kanidm.db kanidm/server:latest kanidmd cert-generate`
+
+3. Start the container and create the two break-glass admin passwords:
+
+`docker exec -it kanidm kanidmd recover-account admin`
+`docker exec -it kanidm kanidmd recover-account idm_admin`
+
+`admin` manages server settings and `idm_admin` manages people and groups. The image is minimal and has no shell, so the Unraid Console button will not work; use `docker exec -it kanidm kanidmd ...` as shown. Day-to-day work uses the `kanidm` CLI (https://kanidm.github.io/kanidm/stable/installing_client_tools.html), e.g. `kanidm person create`, then `kanidm person credential create-reset-token`.
+
+**Reverse proxy:** proxy to `https://YOUR-SERVER-IP:8443` (HTTPS backend; skip verification when the certificate is self-signed). To log real client IPs, add an `http_client_address_info` section with `x-forward-for` set to your proxy IP in `/data/server.toml` (see the example config linked below).
+
+**Optional settings:** every option can be set with a `KANIDM_*` variable or in `/data/server.toml` (variables win). Enable LDAPS by adding the variable `KANIDM_LDAPBINDADDRESS` = `0.0.0.0:3636` (the LDAPS port is already mapped). Reference: https://github.com/kanidm/kanidm/blob/master/examples/server_container.toml
+
+**Updates:** Kanidm only supports upgrading one minor version at a time (1.11 to 1.12 to 1.13). If you update rarely, pin the tag (e.g. `kanidm/server:1.12.1`) and step through each release. Run `docker exec -it kanidm kanidmd domain upgrade-check` before upgrading. Online backups are written daily to /data/backups.
+
+**Hardening:** the image runs as root by default. To use a dedicated user, add `--user 4389:4389` (any free UID) to Extra Parameters and `chown -R 4389:4389 /mnt/user/appdata/kanidm` first (see the security hardening chapter).</Overview>
+  <Category>Security: Network:Other Tools:System</Category>
+  <ExtraSearchTerms>identity idm sso oauth2 oidc openid ldap ldaps passkey webauthn totp radius authentication</ExtraSearchTerms>
+  <WebUI>https://[IP]:[PORT:8443]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/kanidm/kanidm.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/kanidm.png</Icon>
+  <ExtraParams>--cap-drop ALL --security-opt no-new-privileges=true</ExtraParams>
+  <PostArgs></PostArgs>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>A domain name with an HTTPS certificate (or a self-signed one generated with kanidmd cert-generate, see Overview)</Requires>
+  <Changes>
+### 2026-11-22
+- Initial release
+  </Changes>
+  <Config Name="HTTPS Port" Target="8443" Default="8443" Mode="tcp" Description="Web portal, OAuth2/OIDC and API (HTTPS only)." Type="Port" Display="always" Required="true" Mask="false">8443</Config>
+  <Config Name="LDAPS Port" Target="3636" Default="3636" Mode="tcp" Description="Read-only LDAPS gateway. Only active after you set KANIDM_LDAPBINDADDRESS (see Overview)." Type="Port" Display="always" Required="false" Mask="false">3636</Config>
+  <Config Name="Data" Target="/data" Default="/mnt/user/appdata/kanidm" Mode="rw" Description="Database, certificates (chain.pem/key.pem), optional server.toml and online backups." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/kanidm</Config>
+  <Config Name="Domain" Target="KANIDM_DOMAIN" Default="idm.example.com" Mode="" Description="Kanidm domain name, e.g. idm.example.com. Choose carefully: changing it breaks passkeys and OAuth2 clients." Type="Variable" Display="always" Required="true" Mask="false">idm.example.com</Config>
+  <Config Name="Origin" Target="KANIDM_ORIGIN" Default="https://idm.example.com" Mode="" Description="Public HTTPS URL users and OAuth2 clients use. Must be https:// and match the domain." Type="Variable" Display="always" Required="true" Mask="false">https://idm.example.com</Config>
+  <Config Name="TLS Chain" Target="KANIDM_TLS_CHAIN" Default="/data/chain.pem" Mode="" Description="Full certificate chain (PEM) inside the container." Type="Variable" Display="advanced" Required="true" Mask="false">/data/chain.pem</Config>
+  <Config Name="TLS Key" Target="KANIDM_TLS_KEY" Default="/data/key.pem" Mode="" Description="Private key (PEM) inside the container." Type="Variable" Display="advanced" Required="true" Mask="false">/data/key.pem</Config>
+  <Config Name="Database Path" Target="KANIDM_DB_PATH" Default="/data/kanidm.db" Mode="" Description="SQLite database file." Type="Variable" Display="advanced" Required="true" Mask="false">/data/kanidm.db</Config>
+  <Config Name="Bind Address" Target="KANIDM_BINDADDRESS" Default="0.0.0.0:8443" Mode="" Description="HTTPS listen address inside the container." Type="Variable" Display="advanced" Required="true" Mask="false">0.0.0.0:8443</Config>
+  <Config Name="Database FS Type" Target="KANIDM_DB_FS_TYPE" Default="generic|zfs" Mode="" Description="Set zfs when appdata is on a ZFS pool, to tune the page size." Type="Variable" Display="advanced" Required="false" Mask="false">generic</Config>
+  <Config Name="Backup Path" Target="KANIDM_ONLINE_BACKUP_PATH" Default="/data/backups/" Mode="" Description="Folder for automatic online backups." Type="Variable" Display="advanced" Required="false" Mask="false">/data/backups/</Config>
+  <Config Name="Backup Schedule" Target="KANIDM_ONLINE_BACKUP_SCHEDULE" Default="00 22 * * *" Mode="" Description="Cron schedule (UTC) for online backups." Type="Variable" Display="advanced" Required="false" Mask="false">00 22 * * *</Config>
+  <Config Name="Backup Versions" Target="KANIDM_ONLINE_BACKUP_VERSIONS" Default="7" Mode="" Description="How many backups to keep." Type="Variable" Display="advanced" Required="false" Mask="false">7</Config>
+  <Config Name="Log Level" Target="KANIDM_LOG_LEVEL" Default="info|debug|trace" Mode="" Description="Server log level." Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
+</Container>

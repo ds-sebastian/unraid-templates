@@ -4,42 +4,65 @@
   <Repository>blampe/rreading-glasses:latest</Repository>
   <Registry>https://hub.docker.com/r/blampe/rreading-glasses</Registry>
   <Network>bridge</Network>
+  <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
   <Support>https://github.com/blampe/rreading-glasses/issues</Support>
   <Project>https://github.com/blampe/rreading-glasses</Project>
-  <Overview>rreading-glasses is a drop-in replacement for the official metadata provider that delivers lightning-fast, high-coverage book and author data to your Arr-based library clients (e.g. Readarr, Calibre). &#xD;
-&#xD;
-- Speeds up searches and imports by caching metadata in memory and Postgres&#xD;
-- Supports very large authors and upcoming releases not found in the official service&#xD;
-- Provides full Goodreads compatibility or can proxy the open-source Hardcover API</Overview>
-  <Beta>True</Beta>
-  <Category>Other: MediaServer:Books</Category>
-  <ExtraSearchTerms>readarr goodreads books glasses blampe metadata arr hardcover</ExtraSearchTerms>
-  <TemplateURL>https://github.com/ds-sebastian/unraid-templates/blob/main/rreading-glasses/rreading-glasses.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/refs/heads/main/icons/rReadingGlasses.png</Icon>
-  <ExtraParams>--entrypoint /main</ExtraParams>
-  <PostArgs>serve</PostArgs>
-  <DateInstalled>1746320808</DateInstalled>
-  <Changes>
-    ### 2025-05-03
+  <ReadMe>https://github.com/blampe/rreading-glasses/blob/main/README.md</ReadMe>
+  <Overview>rreading-glasses is a drop-in replacement for the retired Readarr metadata service. It gives Readarr forks (Bookshelf, Faustvii/Readarr) fast, complete book and author metadata, including large authors and new releases, with a Postgres cache.
 
-    Initial release
+**Pick a metadata source with the Repository tag**
+
+- `blampe/rreading-glasses:latest` uses Goodreads. Backward-compatible with existing Readarr libraries. Keep Upstream set to `www.goodreads.com`.
+- `blampe/rreading-glasses:hardcover` uses Hardcover. Better curated, but needs a fresh Readarr/Bookshelf install. Set Upstream to `api.hardcover.app` and fill in the Hardcover Auth token.
+
+**Before you install**
+
+Create a Postgres database (any version, e.g. the official postgres:17 container) with a user and an empty database called `rreading-glasses`. Use a password without special characters.
+
+**Connect your library app**
+
+1. In Readarr or Bookshelf, open `http://YOUR-ARR:8787/settings/development` (the page is hidden, type the URL by hand).
+2. Set **Metadata Provider Source** to `http://YOUR-SERVER-IP:8788` (this container) and click Save.
+3. Search and add authors as usual. If files become unmapped after a metadata refresh, fix them under Library &gt; Unmapped Files.
+
+Do not want to self-host? The public instances are `https://api.bookinfo.pro` (Goodreads) and `https://hardcover.bookinfo.pro`.
+
+**Notes**
+
+- The app uses all the memory it can get for caching, so this template limits it with `--memory=256m` (upstream's compose uses 128m). Adjust in Extra Parameters.
+- The Goodreads cookie and requests-per-minute settings are no longer needed and have been removed.
+- Hardcover tokens expire every year on January 1. Generate a new one at hardcover.app &gt; Settings &gt; Hardcover API.</Overview>
+  <Category>MediaApp:Books Tools:Utilities</Category>
+  <ExtraSearchTerms>readarr bookshelf goodreads books metadata arr hardcover bookinfo</ExtraSearchTerms>
+  <WebUI/>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/rreading-glasses/rreading-glasses.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/rReadingGlasses.png</Icon>
+  <ExtraParams>--entrypoint /main --memory=256m</ExtraParams>
+  <PostArgs>serve</PostArgs>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>A Postgres database (any version)
+For the hardcover tag: a Hardcover API token (Bearer ...)</Requires>
+  <Changes>
+### 2026-11-22
+- Removed COOKIE and RPM: current releases ignore them ("no longer required")
+- Documented the latest (Goodreads) and hardcover image tags and the matching Upstream values
+- Added verbose logging, a memory limit and connection steps for Readarr/Bookshelf
+- Masked the Hardcover token, fixed the template and icon URLs and the category
+### 2025-05-03
+- Initial release
   </Changes>
-  <Requires>Postgres&#xD;
-Either:&#xD;
-&#x2013; A valid Goodreads session cookie (to avoid 1 RPS throttling on Goodreads queries)&#xD;
-&#x2013; OR a Hardcover API Bearer token (for Hardcover upstream)</Requires>
-  <Config Name="Port" Target="8788" Default="8788" Mode="tcp" Description="" Type="Port" Display="always" Required="false" Mask="false">8788</Config>
-  <Config Name="PostgreSQL Host" Target="POSTGRES_HOST" Default="" Mode="" Description="The hostname or IP address of your Postgres server." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="PostgreSQL User" Target="POSTGRES_USER" Default="" Mode="" Description="The username to connect to Postgres." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="PostgreSQL Password" Target="POSTGRES_PASSWORD" Default="" Mode="" Description="The password for the Postgres user." Type="Variable" Display="always" Required="true" Mask="true"/>
-  <Config Name="PostgreSQL Database" Target="POSTGRES_DATABASE" Default="rreading-glasses" Mode="" Description="The database name to use." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="Port" Target="8788" Default="8788" Mode="tcp" Description="Metadata API port. Point Readarr/Bookshelf's Metadata Provider Source at http://[IP]:8788" Type="Port" Display="always" Required="true" Mask="false">8788</Config>
+  <Config Name="PostgreSQL Host" Target="POSTGRES_HOST" Default="" Mode="" Description="Hostname or IP of your Postgres server, e.g. 192.168.1.10" Type="Variable" Display="always" Required="true" Mask="false"/>
   <Config Name="PostgreSQL Port" Target="POSTGRES_PORT" Default="5432" Mode="" Description="Postgres port." Type="Variable" Display="always" Required="true" Mask="false">5432</Config>
-  <Config Name="Cookie" Target="COOKIE" Default="" Mode="" Description="Cookie used for upstream HTTP requests." Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="Upstream" Target="UPSTREAM" Default="www.goodreads.com" Mode="" Description="The upstream host (e.g. www.example.com)." Type="Variable" Display="always" Required="true" Mask="false">www.goodreads.com</Config>
-  <Config Name="HardcoverAuth" Target="HARDCOVER_AUTH" Default="" Mode="" Description="Hardcover Authorization header, e.g. 'Bearer ...'" Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="Port" Target="PORT" Default="8788" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">8788</Config>
-  <Config Name="RPM" Target="RPM" Default="60" Mode="" Description="Maximum upstream requests per minute." Type="Variable" Display="advanced" Required="false" Mask="false">60</Config>
-  <Config Name="Proxy" Target="PROXY" Default="" Mode="" Description="HTTP proxy URL for upstream requests. (Leave empty if not used)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="PostgreSQL User" Target="POSTGRES_USER" Default="rreading-glasses" Mode="" Description="Postgres user." Type="Variable" Display="always" Required="true" Mask="false">rreading-glasses</Config>
+  <Config Name="PostgreSQL Password" Target="POSTGRES_PASSWORD" Default="" Mode="" Description="Password for the Postgres user. Avoid special characters." Type="Variable" Display="always" Required="true" Mask="true"/>
+  <Config Name="PostgreSQL Database" Target="POSTGRES_DATABASE" Default="rreading-glasses" Mode="" Description="Database name. It must already exist." Type="Variable" Display="always" Required="true" Mask="false">rreading-glasses</Config>
+  <Config Name="Upstream" Target="UPSTREAM" Default="www.goodreads.com" Mode="" Description="Metadata upstream host. www.goodreads.com for the latest tag; api.hardcover.app for the hardcover tag." Type="Variable" Display="always" Required="true" Mask="false">www.goodreads.com</Config>
+  <Config Name="Hardcover Auth" Target="HARDCOVER_AUTH" Default="" Mode="" Description="Only for the hardcover tag (required there). The full header value including the word Bearer, e.g. Bearer eyJ... Get it from hardcover.app > Settings > Hardcover API." Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Verbose Logging" Target="VERBOSE" Default="false|true" Mode="" Description="Debug logging (upstream's compose examples use --verbose)." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Proxy" Target="PROXY" Default="" Mode="" Description="Optional HTTP proxy URL for upstream requests." Type="Variable" Display="advanced" Required="false" Mask="false"/>
 </Container>

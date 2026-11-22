@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>OpenThread-Border-Router</Name>
+  <Repository>openthread/border-router:stable</Repository>
+  <Registry>https://hub.docker.com/r/openthread/border-router</Registry>
+  <Network>host</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/openthread/ot-br-posix/issues</Support>
+  <Project>https://openthread.io/guides/border-router</Project>
+  <ReadMe>https://openthread.io/guides/border-router/docker</ReadMe>
+  <Overview>The official OpenThread Border Router (OTBR) image from the OpenThread project (Google). It turns a USB Thread radio flashed with OpenThread RCP firmware into a Thread border router for Matter-over-Thread and Thread devices, with a REST API for Home Assistant's OpenThread Border Router integration and a small web UI. It is the plain upstream image; the separate OpenThreadBorderRouter-HA template in this repository uses the Home Assistant add-on build instead. Run only one of them per radio.
+
+**1. Radio firmware**
+
+The USB stick must run OpenThread **RCP** firmware (not Zigbee, not multiprotocol). Home Assistant Connect ZBT-1/SkyConnect and ZBT-2: flash the OpenThread firmware with https://toolbox.openhomefoundation.org/ (460800 baud with hardware flow control, Home Assistant's default). Other radios such as the nRF52840 dongle: see https://openthread.io/platforms and use the baud rate of your firmware. The baud rate and flow control in OT_RCP_DEVICE must match the firmware.
+
+**2. Unraid network settings**
+
+- Settings &gt; Network Settings: Network protocol **IPv4 + IPv6**, and IPv6 address assignment **Automatic**.
+- The container must use **host** networking; Thread devices are reached over IPv6 routes on your LAN interface (usually `br0`, or `eth0`/`bond0` without bridging).
+
+**3. Host kernel settings (required)**
+
+OTBR needs IPv6 forwarding on the host, and the LAN interface must keep accepting router advertisements while forwarding (accept_ra=2), otherwise Unraid loses its own IPv6 address and Thread devices become unreachable. Docker cannot set these with --sysctl in host network mode (that is why they are not in Extra Parameters). Run on the host, replacing br0 with your interface:
+
+`sysctl -w net.ipv4.ip_forward=1`
+`sysctl -w net.ipv6.conf.all.forwarding=1`
+`sysctl -w net.ipv6.conf.br0.accept_ra=2`
+`sysctl -w net.ipv6.conf.br0.accept_ra_rt_info_max_plen=64`
+
+Unraid resets these at reboot and when DHCP renews the interface, so put them in a User Scripts script that runs **At Startup of Array** and also on a custom schedule such as `*/5 * * * *`.
+
+**4. Container settings**
+
+- Radio: pick your stick under /dev/serial/by-id/ (stable across reboots) and keep `:/dev/ttyUSB0` at the end so it appears as /dev/ttyUSB0 inside the container.
+- `/dev/net/tun` and the NET_ADMIN capability (Extra Parameters) are needed to create the wpan0 interface and the firewall/NAT64 rules. Privileged mode is not needed.
+- Thread credentials are stored in the Data folder; back it up. Losing it means re-pairing every device.
+
+**5. Home Assistant**
+
+Add the **OpenThread Border Router** integration with URL `http://YOUR-SERVER-IP:8081`, then the **Thread** integration. Under Settings &gt; Devices &gt; Thread, form a network or make this the preferred network and send the credentials to your phone for Matter commissioning. Phones and Home Assistant must be able to route IPv6 to your LAN.
+
+**Image tag:** `stable` is the monthly release (vYYYY.MM.0). `latest` is rebuilt on every commit and can break, so use it only to test a fix. Pin a version (e.g. `openthread/border-router:v2026.11.0`) if you want to control upgrades.
+
+**Security:** the REST API (port 8081) and web UI have no authentication and can change or read the Thread network key. Keep them on your LAN; set OT_REST_LISTEN_ADDR to 127.0.0.1 if Home Assistant also runs in host network mode on this server.
+
+Docs: https://openthread.io/guides/border-router/docker · Home Assistant: https://www.home-assistant.io/integrations/otbr/</Overview>
+  <Category>HomeAutomation: Network:Other</Category>
+  <ExtraSearchTerms>thread otbr matter border router openthread home assistant skyconnect zbt-1 zbt-2 rcp ipv6</ExtraSearchTerms>
+  <WebUI>http://[IP]:28080/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/otbr/otbr.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/icons/otbr-icon.png</Icon>
+  <ExtraParams>--cap-add=NET_ADMIN --stop-timeout=30</ExtraParams>
+  <PostArgs></PostArgs>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>A Thread USB radio flashed with OpenThread RCP firmware
+Unraid IPv6 enabled and the host sysctls from the Overview applied</Requires>
+  <Changes>
+### 2026-11-22
+- Initial release
+  </Changes>
+  <Config Name="Radio (USB device)" Target="/dev/ttyUSB0" Default="/dev/serial/by-id/YOUR-RADIO-if00-port0:/dev/ttyUSB0" Mode="" Description="Host path of your RCP radio, followed by :/dev/ttyUSB0. Find it with ls -l /dev/serial/by-id/ (ZBT-1/SkyConnect show as usb-Nabu_Casa_SkyConnect...)." Type="Device" Display="always" Required="true" Mask="false">/dev/serial/by-id/YOUR-RADIO-if00-port0:/dev/ttyUSB0</Config>
+  <Config Name="TUN Device" Target="/dev/net/tun" Default="/dev/net/tun" Mode="" Description="Required to create the Thread network interface (wpan0)." Type="Device" Display="advanced" Required="true" Mask="false">/dev/net/tun</Config>
+  <Config Name="Data" Target="/data/thread" Default="/mnt/user/appdata/otbr" Mode="rw" Description="Thread network credentials and settings (keep a backup)." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/otbr</Config>
+  <Config Name="RCP Device URL" Target="OT_RCP_DEVICE" Default="spinel+hdlc+uart:///dev/ttyUSB0?uart-baudrate=460800&amp;uart-flow-control" Mode="" Description="Radio URL. Home Assistant ZBT-1/SkyConnect/ZBT-2: 460800 with uart-flow-control. For other radios use the baud rate of your firmware and remove &amp;uart-flow-control if it has no flow control." Type="Variable" Display="always" Required="true" Mask="false">spinel+hdlc+uart:///dev/ttyUSB0?uart-baudrate=460800&amp;uart-flow-control</Config>
+  <Config Name="Infrastructure Interface" Target="OT_INFRA_IF" Default="br0" Mode="" Description="Host LAN interface Thread is routed to (br0, eth0, bond0 or a VLAN like br0.3). Use the interface that has your LAN IPv6 address." Type="Variable" Display="always" Required="true" Mask="false">br0</Config>
+  <Config Name="Thread Interface" Target="OT_THREAD_IF" Default="wpan0" Mode="" Description="Name of the Thread network interface created on the host. Change only if wpan0 already exists." Type="Variable" Display="advanced" Required="true" Mask="false">wpan0</Config>
+  <Config Name="REST API Address" Target="OT_REST_LISTEN_ADDR" Default="0.0.0.0" Mode="" Description="Address for the REST API used by Home Assistant. 0.0.0.0 = reachable on the LAN; 127.0.0.1 = this server only." Type="Variable" Display="always" Required="false" Mask="false">0.0.0.0</Config>
+  <Config Name="REST API Port" Target="OT_REST_LISTEN_PORT" Default="8081" Mode="" Description="REST API port (Home Assistant integration URL http://[IP]:8081)." Type="Variable" Display="always" Required="false" Mask="false">8081</Config>
+  <Config Name="Web UI Address" Target="OT_WEB_LISTEN_ADDR" Default="0.0.0.0" Mode="" Description="Address for the OTBR web UI. Set 127.0.0.1 to disable LAN access." Type="Variable" Display="advanced" Required="false" Mask="false">0.0.0.0</Config>
+  <Config Name="Web UI Port" Target="OT_WEB_LISTEN_PORT" Default="28080" Mode="" Description="OTBR web UI port. Unraid uses 80, and 8080 is often taken, so 28080 is the default here." Type="Variable" Display="always" Required="false" Mask="false">28080</Config>
+  <Config Name="Log Level" Target="OT_LOG_LEVEL" Default="4" Mode="" Description="otbr-agent log level 0-7 (4 = warning, 6 = info, 7 = debug, very noisy)." Type="Variable" Display="advanced" Required="false" Mask="false">4</Config>
+  <Config Name="Vendor Name" Target="OT_VENDOR_NAME" Default="Unraid" Mode="" Description="Vendor name advertised over mDNS and shown in Home Assistant." Type="Variable" Display="advanced" Required="false" Mask="false">Unraid</Config>
+  <Config Name="Model Name" Target="OT_VENDOR_MODEL" Default="Thread Border Router" Mode="" Description="Model name advertised over mDNS and shown in Home Assistant." Type="Variable" Display="advanced" Required="false" Mask="false">Thread Border Router</Config>
+</Container>
