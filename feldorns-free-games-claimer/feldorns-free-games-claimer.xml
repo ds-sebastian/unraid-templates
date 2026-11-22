@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>Feldorns-Free-Games-Claimer</Name>
+  <Repository>ghcr.io/feldorn/free-games-claimer:latest</Repository>
+  <Registry>https://github.com/feldorn/free-games-claimer/pkgs/container/free-games-claimer</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/feldorn/free-games-claimer/issues</Support>
+  <Project>https://github.com/feldorn/free-games-claimer</Project>
+  <ReadMe>https://github.com/feldorn/free-games-claimer/blob/main/README.md</ReadMe>
+  <Overview>Feldorn's fork of vogler/free-games-claimer. It claims free games automatically from Epic Games, Amazon Prime Gaming/Luna, GOG and Steam, and adds a web control panel, a built-in scheduler, Microsoft Rewards, FAB assets and notify-only watchers.
+
+**What the fork adds**
+
+- Control panel on port 7080: sessions, embedded browser (noVNC), stats, schedule, logs, alerts, notifications and settings
+- Built-in scheduler (no cron needed) with pause, jitter and claim history
+- Captcha pause with a push notification that deep-links to the embedded browser
+- Cookie upload for logins blocked by fingerprinting
+- Microsoft Rewards (daily desktop and mobile Bing searches and activity cards)
+- Optional FAB asset claiming, a Steam quality filter, Prime to Steam key auto-redeem
+- Notify-only watchers for Ubisoft, Humble, Fanatical, Lenovo, IndieGala, PlayStation Plus and Xbox
+- Home Assistant sensors at /api/hass/sensors and Apprise notifications
+
+**First run**
+
+1. Start the container and open the WebUI (port 7080). Nothing is claimed on boot. Unraid passes your server's timezone (TZ), which the scheduler and browser use.
+2. Sessions tab: click **Login** for each store, sign in inside the embedded browser (captcha, 2FA, Steam Guard) and click **I'm Logged In**. Then **Check All Sessions**.
+3. Set a schedule: Daily Start Time below, or Settings &gt; Scheduler in the panel. With no schedule, nothing runs automatically.
+4. Optional: add Apprise notification URLs and PUBLIC_URL so captcha alerts link back to the panel.
+
+Store credentials and OTP keys are optional. They only enable automatic re-login when a session expires. Settings saved in the panel override these variables. Disable stores you do not use with the Active switches or in Settings.
+
+**Security:** the panel has no password by default, and port 6080 gives full control of a browser logged in to your accounts. Keep it on your LAN or set Settings &gt; Web UI Auth (or PANEL_PASSWORD); with auth on, noVNC runs through the panel and you can remove port 6080.
+
+Raw VNC: add a port mapping for 5900 and set VNC_PASSWORD if you want to use a VNC client.
+
+Multiple accounts: run one container per account, each with its own appdata folder and port pair. Full variable reference: https://github.com/feldorn/free-games-claimer/blob/main/docs/CONFIGURATION.md</Overview>
+  <Category>Tools:Utilities Other:</Category>
+  <ExtraSearchTerms>free games claimer fgc epic gog steam prime gaming luna amazon microsoft rewards feldorn vogler</ExtraSearchTerms>
+  <WebUI>http://[IP]:[PORT:7080]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/ds-sebastian/unraid-templates/main/feldorns-free-games-claimer/feldorns-free-games-claimer.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/feldorn/free-games-claimer/main/assets/icon-256.png</Icon>
+  <ExtraParams>--shm-size=512m</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+  <Changes>
+### 2026-11-22
+- Initial release
+  </Changes>
+  <Config Name="WebUI / Control Panel" Target="7080" Default="7080" Mode="tcp" Description="Control panel (sessions, embedded browser, stats, schedule, settings). If you change it, also set PANEL_PORT to the same value; the image health check uses 7080." Type="Port" Display="always" Required="true" Mask="false">7080</Config>
+  <Config Name="noVNC" Target="6080" Default="6080" Mode="tcp" Description="Embedded browser (noVNC) used for logins and captchas. Host and container port must be identical (change NOVNC_PORT and both sides together). Not needed once panel auth is on, because noVNC is then proxied through the panel. Not password-protected on its own." Type="Port" Display="always" Required="false" Mask="false">6080</Config>
+  <Config Name="Data" Target="/fgc/data" Default="/mnt/user/appdata/feldorns-free-games-claimer" Mode="rw" Description="Browser sessions, claim databases, config.json (Settings tab), config.env, screenshots and logs." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/feldorns-free-games-claimer</Config>
+  <Config Name="Panel Password" Target="PANEL_PASSWORD" Default="" Mode="" Description="Optional password for the control panel. The preferred way is Settings &gt; Web UI Auth. With auth on, noVNC goes through the panel and port 6080 can be removed." Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Daily Start Time" Target="START_TIME" Default="" Mode="" Description="HH:MM daily run time in TZ, e.g. 08:00. With no schedule set, nothing runs automatically (use Run Now or the Schedule tab)." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Start Jitter (minutes)" Target="START_JITTER" Default="0" Mode="" Description="Random delay 0-720 minutes added to START_TIME." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Start Days" Target="START_DAYS" Default="0,1,2,3,4,5,6" Mode="" Description="Days to run with START_TIME. 0=Sunday." Type="Variable" Display="advanced" Required="false" Mask="false">0,1,2,3,4,5,6</Config>
+  <Config Name="Loop (seconds)" Target="LOOP" Default="0" Mode="" Description="With START_TIME: sub-daily cadence. Alone: interval after each run finishes. 0 = off." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Run On Startup" Target="RUN_ON_STARTUP" Default="0|1|2" Mode="" Description="0 off, 1 run once at container start, 2 run once then exit (set Restart Policy to no, otherwise it loops)." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Notification URLs (Apprise)" Target="NOTIFY" Default="" Mode="" Description="Apprise URL(s), space separated, e.g. discord://webhook_id/token, tgram://bottoken/ChatID, ntfys://topic, pover://user@token. https://github.com/caronc/apprise/wiki" Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Notification Title" Target="NOTIFY_TITLE" Default="" Mode="" Description="Optional notification title." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Notification Level" Target="NOTIFY_LEVEL" Default="all|actions|digest|off" Mode="" Description="all, actions (only things that need you), digest (one daily summary) or off." Type="Variable" Display="advanced" Required="false" Mask="false">all</Config>
+  <Config Name="Digest Hour" Target="NOTIFY_DIGEST_HOUR" Default="8" Mode="" Description="Hour 0-23 for the daily digest." Type="Variable" Display="advanced" Required="false" Mask="false">8</Config>
+  <Config Name="Attach Screenshots" Target="NOTIFY_ATTACH_SCREENSHOTS" Default="1|0" Mode="" Description="Attach screenshots to notifications." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Captcha Notify Priority" Target="CAPTCHA_NOTIFY_PRIORITY" Default="high|emergency|normal|moderate|low" Mode="" Description="Priority of captcha alerts." Type="Variable" Display="advanced" Required="false" Mask="false">high</Config>
+  <Config Name="Public URL" Target="PUBLIC_URL" Default="" Mode="" Description="External panel URL used for deep links in notifications, e.g. http://192.168.1.10:7080 or https://fgc.example.com. Without it, captcha links point to localhost." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Default Email" Target="EMAIL" Default="" Mode="" Description="Fallback login email for every store. Optional: you can log in through the panel instead." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Default Password" Target="PASSWORD" Default="" Mode="" Description="Fallback password for every store." Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Epic Games Email" Target="EG_EMAIL" Default="" Mode="" Description="Overrides EMAIL for Epic Games." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Epic Games Password" Target="EG_PASSWORD" Default="" Mode="" Description="Overrides PASSWORD for Epic Games." Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Epic Games OTP Key" Target="EG_OTPKEY" Default="" Mode="" Description="TOTP secret for automatic 2FA (Epic &gt; Password &amp; Security &gt; third-party authenticator &gt; Manual Entry Key)." Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Epic Games Parental PIN" Target="EG_PARENTALPIN" Default="" Mode="" Description="Parental control PIN, if set." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Epic Games Active" Target="EG_ACTIVE" Default="1|0" Mode="" Description="Claim Epic Games Store freebies." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Epic Games Mobile" Target="EG_MOBILE" Default="true|false" Mode="" Description="Also claim Epic mobile games." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Epic Games Notify Only" Target="EG_NOTIFY_ONLY" Default="false|true" Mode="" Description="Only notify about free games, never click Get (for captcha-prone IPs)." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Epic Captcha Wait (minutes)" Target="EG_CAPTCHA_WAIT_MIN" Default="3" Mode="" Description="Minutes to wait for you to solve a captcha." Type="Variable" Display="advanced" Required="false" Mask="false">3</Config>
+  <Config Name="Prime Gaming Email" Target="PG_EMAIL" Default="" Mode="" Description="Amazon account for Prime Gaming / Luna." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Prime Gaming Password" Target="PG_PASSWORD" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Prime Gaming OTP Key" Target="PG_OTPKEY" Default="" Mode="" Description="Amazon TOTP secret (Login &amp; security &gt; 2-step verification &gt; Add new app &gt; Can't scan)." Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Prime Gaming Active" Target="PG_ACTIVE" Default="1|0" Mode="" Description="Claim Prime Gaming / Luna games." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Prime Gaming Redeem" Target="PG_REDEEM" Default="0|1" Mode="" Description="Redeem keys on external stores (experimental)." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Prime Steam Auto-Redeem" Target="PG_STEAM_AUTOREDEEM" Default="0|1" Mode="" Description="Queue Steam keys from Prime for the next Steam run." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Prime Retry Pending" Target="PG_RETRY_PENDING" Default="0|1" Mode="" Description="Retry pending Microsoft Store / Xbox codes." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Prime Time Left (days)" Target="PG_TIMELEFT" Default="" Mode="" Description="Skip games with more than this many days left." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Prime Base URL" Target="PG_BASE_URL" Default="https://luna.amazon.com" Mode="" Description="Country-specific Luna domain." Type="Variable" Display="advanced" Required="false" Mask="false">https://luna.amazon.com</Config>
+  <Config Name="Legacy Games Email" Target="LG_EMAIL" Default="" Mode="" Description="Email for Legacy Games redemptions (defaults to PG_EMAIL)." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="GOG Email" Target="GOG_EMAIL" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="GOG Password" Target="GOG_PASSWORD" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="GOG 2FA Backup Codes" Target="GOG_OTP_BACKUP_CODES" Default="" Mode="" Description="Comma-separated GOG backup codes, used one at a time (GOG uses email codes, no TOTP)." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="GOG Active" Target="GOG_ACTIVE" Default="1|0" Mode="" Description="Claim GOG giveaways." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="GOG Keep Newsletter" Target="GOG_NEWSLETTER" Default="0|1" Mode="" Description="1 keeps the newsletter subscription GOG adds when claiming." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Steam Email" Target="STEAM_EMAIL" Default="" Mode="" Description="Steam account. Steam Guard codes are entered through the embedded browser." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Steam Password" Target="STEAM_PASSWORD" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Steam Active" Target="STEAM_ACTIVE" Default="1|0" Mode="" Description="Claim free-to-keep Steam promos." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Steam Min Rating" Target="STEAM_MIN_RATING" Default="6" Mode="" Description="1-9 (6 = Mostly Positive)." Type="Variable" Display="advanced" Required="false" Mask="false">6</Config>
+  <Config Name="Steam Min Price (USD)" Target="STEAM_MIN_PRICE" Default="10" Mode="" Description="Minimum original price." Type="Variable" Display="advanced" Required="false" Mask="false">10</Config>
+  <Config Name="Steam Skip Unrated" Target="STEAM_SKIP_UNRATED" Default="true|false" Mode="" Description="Skip games without reviews." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Steam Points Shop Weekly" Target="STEAM_POINTS_SHOP_WEEKLY" Default="0|1" Mode="" Description="Claim the weekly free Points Shop item." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Microsoft Email" Target="MS_EMAIL" Default="" Mode="" Description="Microsoft Rewards account." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Microsoft Password" Target="MS_PASSWORD" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="true"/>
+  <Config Name="Microsoft OTP Key" Target="MS_OTPKEY" Default="" Mode="" Description="Only for TOTP-app 2FA." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Microsoft Rewards Active" Target="MS_ACTIVE" Default="1|0" Mode="" Description="Desktop Bing searches and activity cards." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Microsoft Rewards Mobile Active" Target="MS_MOBILE_ACTIVE" Default="1|0" Mode="" Description="Mobile Bing searches." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="Microsoft Schedule Window (hours)" Target="MS_SCHEDULE_HOURS" Default="0" Mode="" Description="Daily window width for Microsoft Rewards. 0 = not scheduled on its own." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Microsoft Schedule Start Hour" Target="MS_SCHEDULE_START" Default="8" Mode="" Description="Window start hour 0-23." Type="Variable" Display="advanced" Required="false" Mask="false">8</Config>
+  <Config Name="Microsoft Run With Main Chain" Target="MS_RUN_WITH_MAIN_CHAIN" Default="false|true" Mode="" Description="Run Microsoft Rewards right after the claimers." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Microsoft Max Search Delay (s)" Target="MS_SEARCH_DELAY_MAX_SEC" Default="180" Mode="" Description="Upper bound of the random pause between searches." Type="Variable" Display="advanced" Required="false" Mask="false">180</Config>
+  <Config Name="Microsoft Desktop Searches" Target="MS_DESKTOP_SEARCH_COUNT" Default="35" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">35</Config>
+  <Config Name="Microsoft Mobile Searches" Target="MS_MOBILE_SEARCH_COUNT" Default="25" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">25</Config>
+  <Config Name="Microsoft Redeem Threshold" Target="MS_REDEEM_THRESHOLD" Default="6500" Mode="" Description="Points balance that triggers a redeem reminder." Type="Variable" Display="advanced" Required="false" Mask="false">6500</Config>
+  <Config Name="FAB Assets Active" Target="FAB_ACTIVE" Default="0|1" Mode="" Description="Claim free FAB (Unreal) assets with the Epic session." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Ubisoft Watcher" Target="UBISOFT_ACTIVE" Default="0|1" Mode="" Description="Notify-only watcher." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Humble Watcher" Target="HUMBLE_ACTIVE" Default="0|1" Mode="" Description="Notify-only watcher." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Fanatical Watcher" Target="FANATICAL_ACTIVE" Default="0|1" Mode="" Description="Notify-only watcher." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Lenovo Gaming Watcher" Target="LENOVO_ACTIVE" Default="0|1" Mode="" Description="Notify-only watcher for key drops." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="IndieGala Watcher" Target="INDIEGALA_ACTIVE" Default="0|1" Mode="" Description="Notify-only watcher." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="PlayStation Plus Watcher" Target="PSN_ACTIVE" Default="0|1" Mode="" Description="Notify-only watcher." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Xbox / Game Pass Watcher" Target="XBOX_ACTIVE" Default="0|1" Mode="" Description="Notify-only watcher." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="AliExpress Email" Target="AE_EMAIL" Default="" Mode="" Description="AliExpress coins (deprecated)." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="AliExpress Password" Target="AE_PASSWORD" Default="" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="AliExpress Active" Target="AE_ACTIVE" Default="0|1" Mode="" Description="Enable the deprecated AliExpress coin collector." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Quality Filter" Target="QUALITY_ENABLED" Default="false|true" Mode="" Description="Skip low-quality games using Steam ratings." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Quality Min Score" Target="QUALITY_MIN_SCORE" Default="5" Mode="" Description="0-10." Type="Variable" Display="advanced" Required="false" Mask="false">5</Config>
+  <Config Name="Quality Min Base Price" Target="QUALITY_MIN_BASE_PRICE" Default="2" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">2</Config>
+  <Config Name="Quality Skip Unmatched" Target="QUALITY_SKIP_UNMATCHED" Default="false|true" Mode="" Description="Skip games not found on Steam." Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="Captcha Provider" Target="CAPTCHA_PROVIDER" Default="2captcha" Mode="" Description="Optional paid captcha solver." Type="Variable" Display="advanced" Required="false" Mask="false">2captcha</Config>
+  <Config Name="Captcha API Key" Target="CAPTCHA_API_KEY" Default="" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="VNC Password" Target="VNC_PASSWORD" Default="" Mode="" Description="Password for VNC. Also turns on panel auth if PANEL_PASSWORD is empty." Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Panel Port" Target="PANEL_PORT" Default="7080" Mode="" Description="Internal panel port. Change together with the port mapping." Type="Variable" Display="advanced" Required="false" Mask="false">7080</Config>
+  <Config Name="noVNC Port" Target="NOVNC_PORT" Default="6080" Mode="" Description="Internal noVNC port. Host and container port must match." Type="Variable" Display="advanced" Required="false" Mask="false">6080</Config>
+  <Config Name="Base Path" Target="BASE_PATH" Default="" Mode="" Description="Subfolder for a reverse proxy, e.g. /fgc" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="noVNC URL" Target="NOVNC_URL" Default="" Mode="" Description="Separate noVNC URL when it is served on its own subdomain." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Update Check" Target="UPDATE_CHECK" Default="on|0" Mode="" Description="0 disables the 6-hourly GitHub update check." Type="Variable" Display="advanced" Required="false" Mask="false">on</Config>
+  <Config Name="Width" Target="WIDTH" Default="1920" Mode="" Description="Virtual screen width." Type="Variable" Display="advanced" Required="false" Mask="false">1920</Config>
+  <Config Name="Height" Target="HEIGHT" Default="1080" Mode="" Description="Virtual screen height." Type="Variable" Display="advanced" Required="false" Mask="false">1080</Config>
+  <Config Name="Language" Target="LANG" Default="en-US" Mode="" Description="Browser locale, e.g. de_DE.UTF-8." Type="Variable" Display="advanced" Required="false" Mask="false">en-US</Config>
+  <Config Name="PUID" Target="PUID" Default="" Mode="" Description="Optional. Run as this user (e.g. 99) instead of root; /fgc/data is chowned on start." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="PGID" Target="PGID" Default="" Mode="" Description="Optional. Group for PUID (e.g. 100). Defaults to PUID." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Timeout (s)" Target="TIMEOUT" Default="60" Mode="" Description="Page timeout." Type="Variable" Display="advanced" Required="false" Mask="false">60</Config>
+  <Config Name="Login Timeout (s)" Target="LOGIN_TIMEOUT" Default="180" Mode="" Description="How long to wait for a login." Type="Variable" Display="advanced" Required="false" Mask="false">180</Config>
+  <Config Name="Dry Run" Target="DRYRUN" Default="0|1" Mode="" Description="Do everything except claiming." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Debug" Target="DEBUG" Default="" Mode="" Description="Set 1 for debug logging." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+</Container>
